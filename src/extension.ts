@@ -1,0 +1,126 @@
+import * as vscode from 'vscode';
+import { SearchResultProvider } from './searchProvider';
+import { findAnyTypes } from './anyFinder';
+import { logger } from './logger';
+
+export function activate(context: vscode.ExtensionContext) {
+  logger.info('Lino extension activated');
+  const searchProvider = new SearchResultProvider();
+  const viewModeKey = context.workspaceState.get<'list' | 'tree'>('lino.viewMode', 'list');
+  searchProvider.viewMode = viewModeKey;
+
+  const cachedResults = context.workspaceState.get<any[]>('lino.cachedResults', []);
+  const deserializedResults = cachedResults.map(r => ({
+    ...r,
+    uri: vscode.Uri.parse(r.uriString)
+  }));
+  searchProvider.setResults(deserializedResults);
+
+  const viewModeContextKey = vscode.commands.executeCommand('setContext', 'linoViewMode', viewModeKey);
+
+  const treeView = vscode.window.createTreeView('linoExplorer', {
+    treeDataProvider: searchProvider
+  });
+
+  const updateBadge = () => {
+    const count = searchProvider.getResultCount();
+    treeView.badge = count > 0 ? { value: count, tooltip: `${count} issue${count === 1 ? '' : 's'}` } : undefined;
+  };
+
+  updateBadge();
+
+  let isSearching = false;
+
+  const findAnyCommand = vscode.commands.registerCommand('lino.findAny', async () => {
+    if (isSearching) {
+      vscode.window.showWarningMessage('Search already in progress');
+      return;
+    }
+
+    isSearching = true;
+    vscode.commands.executeCommand('setContext', 'linoSearching', true);
+    treeView.badge = { value: 0, tooltip: 'Searching...' };
+
+    logger.info('Starting "any" type search');
+
+    try {
+      await vscode.window.withProgress({
+        location: vscode.ProgressLocation.Notification,
+        title: 'Searching for "any" types',
+        cancellable: false
+      }, async (progress) => {
+        progress.report({ increment: 0 });
+
+        const startTime = Date.now();
+        const results = await findAnyTypes();
+        const elapsed = Date.now() - startTime;
+
+        logger.info(`Search completed in ${elapsed}ms, found ${results.length} results`);
+
+        progress.report({ increment: 100 });
+
+        searchProvider.setResults(results);
+
+        const serializedResults = results.map(r => {
+          const { uri, ...rest } = r;
+          return {
+            ...rest,
+            uriString: uri.toString()
+          };
+        });
+        context.workspaceState.update('lino.cachedResults', serializedResults);
+        updateBadge();
+
+        if (searchProvider.viewMode === 'tree') {
+          setTimeout(() => {
+            const folders = searchProvider.getAllFolderItems();
+            folders.forEach(folder => {
+              treeView.reveal(folder, { expand: true, select: false, focus: false });
+            });
+          }, 100);
+        }
+
+        if (results.length === 0) {
+          vscode.window.showInformationMessage('No "any" types found!');
+        } else {
+          vscode.window.showInformationMessage(`Found ${results.length} "any" type${results.length === 1 ? '' : 's'}`);
+        }
+      });
+    } finally {
+      isSearching = false;
+      vscode.commands.executeCommand('setContext', 'linoSearching', false);
+    }
+  });
+
+  const openFileCommand = vscode.commands.registerCommand(
+    'lino.openFile',
+    (uri: vscode.Uri, line: number, column: number) => {
+      vscode.workspace.openTextDocument(uri).then(doc => {
+        vscode.window.showTextDocument(doc).then(editor => {
+          const position = new vscode.Position(line, column);
+          editor.selection = new vscode.Selection(position, position);
+          editor.revealRange(
+            new vscode.Range(position, position),
+            vscode.TextEditorRevealType.InCenter
+          );
+        });
+      });
+    }
+  );
+
+  const setListViewCommand = vscode.commands.registerCommand('lino.setListView', () => {
+    searchProvider.viewMode = 'list';
+    context.workspaceState.update('lino.viewMode', 'list');
+    vscode.commands.executeCommand('setContext', 'linoViewMode', 'list');
+  });
+
+  const setTreeViewCommand = vscode.commands.registerCommand('lino.setTreeView', () => {
+    searchProvider.viewMode = 'tree';
+    context.workspaceState.update('lino.viewMode', 'tree');
+    vscode.commands.executeCommand('setContext', 'linoViewMode', 'tree');
+  });
+
+  context.subscriptions.push(findAnyCommand, openFileCommand, setListViewCommand, setTreeViewCommand);
+}
+
+export function deactivate() {}

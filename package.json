@@ -1,0 +1,86 @@
+{
+  "name": "lino",
+  "displayName": "Lino",
+  "description": "Code linting and quality checker for TypeScript projects",
+  "version": "0.0.1",
+  "publisher": "lucasvtiradentes",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "categories": [
+    "Linters"
+  ],
+  "main": "./out/extension.js",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "lino",
+          "title": "Lino",
+          "icon": "resources/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "lino": [
+        {
+          "id": "linoExplorer",
+          "name": "Issues"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "lino.findAny",
+        "title": "Find Any Types",
+        "icon": "$(search)"
+      },
+      {
+        "command": "lino.setListView",
+        "title": "View as List",
+        "icon": "$(list-tree)"
+      },
+      {
+        "command": "lino.setTreeView",
+        "title": "View as Tree",
+        "icon": "$(list-flat)"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "lino.findAny",
+          "when": "view == linoExplorer",
+          "group": "navigation"
+        },
+        {
+          "command": "lino.setListView",
+          "when": "view == linoExplorer && linoViewMode == tree",
+          "group": "navigation"
+        },
+        {
+          "command": "lino.setTreeView",
+          "when": "view == linoExplorer && linoViewMode == list",
+          "group": "navigation"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "bundle": "esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node",
+    "build": "pnpm run bundle",
+    "postbuild": "tsx scripts/install-local.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/vscode": "^1.100.0",
+    "esbuild": "^0.24.0",
+    "tsx": "^4.20.6",
+    "typescript": "^5.7.0"
+  }
+}
