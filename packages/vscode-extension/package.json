@@ -35,19 +35,19 @@
     "viewsWelcome": [
       {
         "view": "linoExplorer",
-        "contents": "No TypeScript any type issues found.\n[Find Any Types](command:lino.findAny)",
+        "contents": "No issues found.\n[Scan Workspace](command:lino.findAny)",
         "when": "workbenchState != empty"
       },
       {
         "view": "linoExplorer",
-        "contents": "Open a folder to start finding TypeScript any type issues.\n[Open Folder](command:vscode.openFolder)",
+        "contents": "Open a folder to start scanning for issues.\n[Open Folder](command:vscode.openFolder)",
         "when": "workbenchState == empty"
       }
     ],
     "commands": [
       {
         "command": "lino.findAny",
-        "title": "Find Any Types",
+        "title": "Scan Workspace",
         "icon": "$(search)"
       },
       {
@@ -64,6 +64,21 @@
         "command": "lino.setGroupByRule",
         "title": "Group by Rule",
         "icon": "$(list-filter)"
+      },
+      {
+        "command": "lino.setScanModeWorkspace",
+        "title": "Scan Mode: Workspace",
+        "icon": "$(file-directory)"
+      },
+      {
+        "command": "lino.setScanModeBranch",
+        "title": "Scan Mode: Branch Diff",
+        "icon": "$(git-branch)"
+      },
+      {
+        "command": "lino.selectCompareBranch",
+        "title": "Select Compare Branch",
+        "icon": "$(gear)"
       },
       {
         "command": "lino.setListView",
@@ -107,6 +122,21 @@
           "command": "lino.setGroupByRule",
           "when": "view == linoExplorer && linoGroupMode == default",
           "group": "navigation@20"
+        },
+        {
+          "command": "lino.setScanModeWorkspace",
+          "when": "view == linoExplorer && linoScanMode == branch",
+          "group": "navigation@25"
+        },
+        {
+          "command": "lino.setScanModeBranch",
+          "when": "view == linoExplorer && linoScanMode == workspace",
+          "group": "navigation@25"
+        },
+        {
+          "command": "lino.selectCompareBranch",
+          "when": "view == linoExplorer && linoScanMode == branch",
+          "group": "navigation@26"
         },
         {
           "command": "lino.setListView",
