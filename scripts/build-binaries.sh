@@ -30,6 +30,8 @@ for TARGET in "${TARGETS[@]}"; do
     cargo build --release --target "$TARGET" 2>/dev/null || echo "⚠️  Skipping $TARGET (requires cross-compilation tools)"
   elif [[ "$TARGET" == *"darwin"* ]] && [[ "$(uname)" != "Darwin" ]]; then
     cargo build --release --target "$TARGET" 2>/dev/null || echo "⚠️  Skipping $TARGET (requires macOS or cross-compilation tools)"
+  elif [[ "$TARGET" == "aarch64-unknown-linux-gnu" ]] && [[ "$(uname -m)" != "aarch64" ]]; then
+    cargo build --release --target "$TARGET" 2>/dev/null || echo "⚠️  Skipping $TARGET (requires cross-compilation tools)"
   else
     cargo build --release --target "$TARGET"
   fi

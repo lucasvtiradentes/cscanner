@@ -1,7 +1,9 @@
 use globset::{Glob, GlobSet, GlobSetBuilder};
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
-use std::path::{Path, PathBuf};
+use std::collections::{HashMap, BTreeMap};
+use std::hash::{Hash, Hasher};
+use std::collections::hash_map::DefaultHasher;
+use std::path::Path;
 use crate::types::Severity;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -114,6 +116,21 @@ impl LinoConfig {
             return false;
         }
         rule_config.include.is_match(path) && !rule_config.exclude.is_match(path)
+    }
+
+    pub fn compute_hash(&self) -> u64 {
+        let mut hasher = DefaultHasher::new();
+
+        let sorted_rules: BTreeMap<_, _> = self.rules.iter().collect();
+        for (name, config) in sorted_rules {
+            name.hash(&mut hasher);
+            config.enabled.hash(&mut hasher);
+            if let Some(pattern) = &config.pattern {
+                pattern.hash(&mut hasher);
+            }
+        }
+
+        hasher.finish()
     }
 }
 

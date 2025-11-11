@@ -7,32 +7,32 @@ use swc_ecma_visit::{Visit, VisitWith};
 use std::path::Path;
 use std::sync::Arc;
 
-pub struct NoAnyTypeRule;
+pub struct NoUnreachableCodeRule;
 
 inventory::submit!(RuleRegistration {
-    name: "no-any-type",
-    factory: || Arc::new(NoAnyTypeRule),
+    name: "no-unreachable-code",
+    factory: || Arc::new(NoUnreachableCodeRule),
 });
 
 inventory::submit!(RuleMetadataRegistration {
     metadata: RuleMetadata {
-        name: "no-any-type",
-        display_name: "No Any Type",
-        description: "Detects usage of TypeScript 'any' type (`: any` and `as any`). Using 'any' defeats the purpose of TypeScript's type system.",
+        name: "no-unreachable-code",
+        display_name: "No Unreachable Code",
+        description: "Detects code after return, throw, break, or continue statements. This code will never execute.",
         rule_type: RuleType::Ast,
         default_severity: Severity::Error,
         default_enabled: false,
-        category: RuleCategory::TypeSafety,
+        category: RuleCategory::BugPrevention,
     }
 });
 
-impl Rule for NoAnyTypeRule {
+impl Rule for NoUnreachableCodeRule {
     fn name(&self) -> &str {
-        "no-any-type"
+        "no-unreachable-code"
     }
 
     fn check(&self, program: &Program, path: &Path, source: &str) -> Vec<Issue> {
-        let mut visitor = AnyTypeVisitor {
+        let mut visitor = UnreachableCodeVisitor {
             issues: Vec::new(),
             path: path.to_path_buf(),
             source,
@@ -42,51 +42,45 @@ impl Rule for NoAnyTypeRule {
     }
 }
 
-struct AnyTypeVisitor<'a> {
+struct UnreachableCodeVisitor<'a> {
     issues: Vec<Issue>,
     path: std::path::PathBuf,
     source: &'a str,
 }
 
-impl<'a> Visit for AnyTypeVisitor<'a> {
-    fn visit_ts_keyword_type(&mut self, n: &TsKeywordType) {
-        if matches!(n.kind, TsKeywordTypeKind::TsAnyKeyword) {
-            let span = n.span();
-            let (line, column) = self.get_line_col(span.lo.0 as usize);
-
-            self.issues.push(Issue {
-                rule: "no-any-type".to_string(),
-                file: self.path.clone(),
-                line,
-                column,
-                message: "Found `: any` type annotation".to_string(),
-                severity: Severity::Error,
-            });
+impl<'a> UnreachableCodeVisitor<'a> {
+    fn is_terminating_stmt(&self, stmt: &Stmt) -> bool {
+        match stmt {
+            Stmt::Return(_) | Stmt::Throw(_) | Stmt::Break(_) | Stmt::Continue(_) => true,
+            _ => false,
         }
-        n.visit_children_with(self);
     }
 
-    fn visit_ts_as_expr(&mut self, n: &TsAsExpr) {
-        if let TsType::TsKeywordType(ref kw) = &*n.type_ann {
-            if matches!(kw.kind, TsKeywordTypeKind::TsAnyKeyword) {
-                let span = kw.span();
+    fn check_block_statements(&mut self, stmts: &[Stmt]) {
+        let mut found_terminator = false;
+
+        for stmt in stmts {
+            if found_terminator {
+                let span = stmt.span();
                 let (line, column) = self.get_line_col(span.lo.0 as usize);
 
                 self.issues.push(Issue {
-                    rule: "no-any-type".to_string(),
+                    rule: "no-unreachable-code".to_string(),
                     file: self.path.clone(),
                     line,
                     column,
-                    message: "Found `as any` type assertion".to_string(),
+                    message: "Unreachable code detected after return/throw/break/continue".to_string(),
                     severity: Severity::Error,
                 });
+                break;
+            }
+
+            if self.is_terminating_stmt(stmt) {
+                found_terminator = true;
             }
         }
-        n.visit_children_with(self);
     }
-}
 
-impl<'a> AnyTypeVisitor<'a> {
     fn get_line_col(&self, byte_pos: usize) -> (usize, usize) {
         let mut line = 1;
         let mut col = 1;
@@ -104,5 +98,17 @@ impl<'a> AnyTypeVisitor<'a> {
         }
 
         (line, col)
+    }
+}
+
+impl<'a> Visit for UnreachableCodeVisitor<'a> {
+    fn visit_block_stmt(&mut self, n: &BlockStmt) {
+        self.check_block_statements(&n.stmts);
+        n.visit_children_with(self);
+    }
+
+    fn visit_switch_case(&mut self, n: &SwitchCase) {
+        self.check_block_statements(&n.cons);
+        n.visit_children_with(self);
     }
 }

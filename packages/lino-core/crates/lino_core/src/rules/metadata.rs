@@ -21,6 +21,7 @@ pub enum RuleCategory {
     CodeQuality,
     Style,
     Performance,
+    BugPrevention,
 }
 
 pub struct RuleMetadataRegistration {

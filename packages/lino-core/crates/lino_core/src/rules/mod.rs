@@ -22,6 +22,14 @@ mod no_console_log;
 mod no_relative_imports;
 mod prefer_type_over_interface;
 mod no_magic_numbers;
+mod no_var;
+mod no_constant_condition;
+mod no_duplicate_imports;
+mod no_unreachable_code;
+mod prefer_const;
+mod no_implicit_any;
+mod consistent_return;
+mod no_empty_function;
 
 pub use metadata::{RuleMetadata, RuleMetadataRegistration, RuleCategory, get_all_rule_metadata};
 pub use regex_rule::RegexRule;

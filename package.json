@@ -5,9 +5,9 @@
   "description": "High-performance TypeScript linting platform with custom rule support",
   "scripts": {
     "dev": "pnpm --filter lino-vscode dev",
-    "build": "pnpm --filter lino-vscode build",
+    "build": "pnpm build:rust && pnpm build:extension",
+    "build:extension": "pnpm --filter lino-vscode build",
     "build:rust": "./scripts/build-binaries.sh",
-    "build:all": "pnpm build:rust && pnpm build",
     "test": "pnpm --recursive test",
     "clean": "pnpm --recursive clean && rm -rf packages/*/node_modules node_modules"
   },

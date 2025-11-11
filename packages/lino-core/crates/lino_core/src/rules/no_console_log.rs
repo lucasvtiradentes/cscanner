@@ -20,7 +20,7 @@ inventory::submit!(RuleMetadataRegistration {
         description: "Finds console.log() statements in code. Console statements should be removed before committing to production.",
         rule_type: RuleType::Regex,
         default_severity: Severity::Warning,
-        default_enabled: true,
+        default_enabled: false,
         category: RuleCategory::CodeQuality,
     }
 });

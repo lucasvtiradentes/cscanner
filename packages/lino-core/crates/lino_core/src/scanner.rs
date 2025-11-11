@@ -20,10 +20,11 @@ pub struct Scanner {
 impl Scanner {
     pub fn new(config: LinoConfig) -> Result<Self, Box<dyn std::error::Error>> {
         let registry = RuleRegistry::with_config(&config)?;
+        let config_hash = config.compute_hash();
         Ok(Self {
             registry,
             config,
-            cache: Arc::new(FileCache::new()),
+            cache: Arc::new(FileCache::with_config_hash(config_hash)),
         })
     }
 

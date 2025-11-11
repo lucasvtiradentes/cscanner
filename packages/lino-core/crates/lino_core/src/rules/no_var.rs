@@ -7,32 +7,32 @@ use swc_ecma_visit::{Visit, VisitWith};
 use std::path::Path;
 use std::sync::Arc;
 
-pub struct NoAnyTypeRule;
+pub struct NoVarRule;
 
 inventory::submit!(RuleRegistration {
-    name: "no-any-type",
-    factory: || Arc::new(NoAnyTypeRule),
+    name: "no-var",
+    factory: || Arc::new(NoVarRule),
 });
 
 inventory::submit!(RuleMetadataRegistration {
     metadata: RuleMetadata {
-        name: "no-any-type",
-        display_name: "No Any Type",
-        description: "Detects usage of TypeScript 'any' type (`: any` and `as any`). Using 'any' defeats the purpose of TypeScript's type system.",
+        name: "no-var",
+        display_name: "No Var",
+        description: "Disallows the use of 'var' keyword. Use 'let' or 'const' instead for block-scoped variables.",
         rule_type: RuleType::Ast,
-        default_severity: Severity::Error,
+        default_severity: Severity::Warning,
         default_enabled: false,
-        category: RuleCategory::TypeSafety,
+        category: RuleCategory::CodeQuality,
     }
 });
 
-impl Rule for NoAnyTypeRule {
+impl Rule for NoVarRule {
     fn name(&self) -> &str {
-        "no-any-type"
+        "no-var"
     }
 
     fn check(&self, program: &Program, path: &Path, source: &str) -> Vec<Issue> {
-        let mut visitor = AnyTypeVisitor {
+        let mut visitor = NoVarVisitor {
             issues: Vec::new(),
             path: path.to_path_buf(),
             source,
@@ -42,51 +42,32 @@ impl Rule for NoAnyTypeRule {
     }
 }
 
-struct AnyTypeVisitor<'a> {
+struct NoVarVisitor<'a> {
     issues: Vec<Issue>,
     path: std::path::PathBuf,
     source: &'a str,
 }
 
-impl<'a> Visit for AnyTypeVisitor<'a> {
-    fn visit_ts_keyword_type(&mut self, n: &TsKeywordType) {
-        if matches!(n.kind, TsKeywordTypeKind::TsAnyKeyword) {
+impl<'a> Visit for NoVarVisitor<'a> {
+    fn visit_var_decl(&mut self, n: &VarDecl) {
+        if matches!(n.kind, VarDeclKind::Var) {
             let span = n.span();
             let (line, column) = self.get_line_col(span.lo.0 as usize);
 
             self.issues.push(Issue {
-                rule: "no-any-type".to_string(),
+                rule: "no-var".to_string(),
                 file: self.path.clone(),
                 line,
                 column,
-                message: "Found `: any` type annotation".to_string(),
-                severity: Severity::Error,
+                message: "Use 'let' or 'const' instead of 'var'".to_string(),
+                severity: Severity::Warning,
             });
-        }
-        n.visit_children_with(self);
-    }
-
-    fn visit_ts_as_expr(&mut self, n: &TsAsExpr) {
-        if let TsType::TsKeywordType(ref kw) = &*n.type_ann {
-            if matches!(kw.kind, TsKeywordTypeKind::TsAnyKeyword) {
-                let span = kw.span();
-                let (line, column) = self.get_line_col(span.lo.0 as usize);
-
-                self.issues.push(Issue {
-                    rule: "no-any-type".to_string(),
-                    file: self.path.clone(),
-                    line,
-                    column,
-                    message: "Found `as any` type assertion".to_string(),
-                    severity: Severity::Error,
-                });
-            }
         }
         n.visit_children_with(self);
     }
 }
 
-impl<'a> AnyTypeVisitor<'a> {
+impl<'a> NoVarVisitor<'a> {
     fn get_line_col(&self, byte_pos: usize) -> (usize, usize) {
         let mut line = 1;
         let mut col = 1;
