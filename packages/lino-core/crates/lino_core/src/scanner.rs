@@ -1,3 +1,4 @@
+use crate::cache::FileCache;
 use crate::parser::parse_file;
 use crate::rules::Rule;
 use crate::types::{FileResult, ScanResult};
@@ -5,16 +6,25 @@ use ignore::WalkBuilder;
 use rayon::prelude::*;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicUsize, Ordering};
+use std::sync::Arc;
 use std::time::Instant;
 use tracing::{debug, info};
 
 pub struct Scanner {
     rules: Vec<Box<dyn Rule>>,
+    cache: Arc<FileCache>,
 }
 
 impl Scanner {
     pub fn new(rules: Vec<Box<dyn Rule>>) -> Self {
-        Self { rules }
+        Self {
+            rules,
+            cache: Arc::new(FileCache::new()),
+        }
+    }
+
+    pub fn with_cache(rules: Vec<Box<dyn Rule>>, cache: Arc<FileCache>) -> Self {
+        Self { rules, cache }
     }
 
     pub fn scan(&self, root: &Path) -> ScanResult {
@@ -46,6 +56,7 @@ impl Scanner {
         info!("Found {} TypeScript files", file_count);
 
         let processed = AtomicUsize::new(0);
+        let cache_hits = AtomicUsize::new(0);
 
         let results: Vec<FileResult> = files
             .par_iter()
@@ -55,6 +66,17 @@ impl Scanner {
                     debug!("Processed {}/{} files", count, file_count);
                 }
 
+                if let Some(cached_issues) = self.cache.get(path) {
+                    cache_hits.fetch_add(1, Ordering::Relaxed);
+                    if cached_issues.is_empty() {
+                        return None;
+                    }
+                    return Some(FileResult {
+                        file: path.clone(),
+                        issues: cached_issues,
+                    });
+                }
+
                 self.analyze_file(path)
             })
             .filter(|r| !r.issues.is_empty())
@@ -62,12 +84,15 @@ impl Scanner {
 
         let total_issues: usize = results.iter().map(|r| r.issues.len()).sum();
         let duration = start.elapsed();
+        let hits = cache_hits.load(Ordering::Relaxed);
 
         info!(
-            "Scan complete: {} issues in {} files ({:.2}ms)",
+            "Scan complete: {} issues in {} files ({:.2}ms, cache hits: {}/{})",
             total_issues,
             results.len(),
-            duration.as_millis()
+            duration.as_millis(),
+            hits,
+            file_count
         );
 
         ScanResult {
@@ -75,6 +100,11 @@ impl Scanner {
             total_issues,
             duration_ms: duration.as_millis(),
         }
+    }
+
+    pub fn scan_single(&self, path: &Path) -> Option<FileResult> {
+        self.cache.invalidate(path);
+        self.analyze_file(path)
     }
 
     fn analyze_file(&self, path: &Path) -> Option<FileResult> {
@@ -94,6 +124,8 @@ impl Scanner {
             .flat_map(|rule| rule.check(&program, path, &source))
             .collect();
 
+        self.cache.insert(path.to_path_buf(), issues.clone());
+
         if issues.is_empty() {
             None
         } else {
@@ -102,5 +134,9 @@ impl Scanner {
                 issues,
             })
         }
+    }
+
+    pub fn cache(&self) -> Arc<FileCache> {
+        self.cache.clone()
     }
 }

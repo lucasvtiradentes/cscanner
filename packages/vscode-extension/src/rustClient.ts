@@ -50,6 +50,7 @@ export class RustClient {
     resolve: (result: any) => void;
     reject: (error: Error) => void;
   }>();
+  private buffer = '';
 
   constructor(private binaryPath: string) {}
 
@@ -65,7 +66,11 @@ export class RustClient {
     });
 
     this.process.stdout!.on('data', (data: Buffer) => {
-      const lines = data.toString().trim().split('\n');
+      this.buffer += data.toString();
+
+      const lines = this.buffer.split('\n');
+      this.buffer = lines.pop() || '';
+
       for (const line of lines) {
         if (!line.trim()) continue;
         try {
@@ -80,7 +85,7 @@ export class RustClient {
             }
           }
         } catch (e) {
-          logger.error(`Failed to parse response: ${line} ${e}`);
+          logger.error(`Failed to parse response (length: ${line.length}): ${e}`);
         }
       }
     });
