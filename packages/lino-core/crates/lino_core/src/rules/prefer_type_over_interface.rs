@@ -60,6 +60,7 @@ impl<'a> Visit for InterfaceVisitor<'a> {
             column,
             message: format!("Prefer 'type' over 'interface' for '{}'", n.id.sym),
             severity: Severity::Warning,
+            line_text: None,
         });
 
         n.visit_children_with(self);

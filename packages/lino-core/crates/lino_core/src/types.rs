@@ -16,6 +16,8 @@ pub struct Issue {
     pub column: usize,
     pub message: String,
     pub severity: Severity,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub line_text: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

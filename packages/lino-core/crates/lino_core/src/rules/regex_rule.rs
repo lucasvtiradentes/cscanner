@@ -39,6 +39,7 @@ impl Rule for RegexRule {
                     column: mat.start() + 1,
                     message: self.message.clone(),
                     severity: self.severity,
+                    line_text: None,
                 });
             }
         }

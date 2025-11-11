@@ -43,6 +43,7 @@ impl Rule for NoConsoleLogRule {
                     column: mat.start() + 1,
                     message: "Avoid using console.log in production code".to_string(),
                     severity: Severity::Warning,
+                    line_text: None,
                 });
             }
         }

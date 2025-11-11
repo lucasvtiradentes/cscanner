@@ -64,6 +64,7 @@ impl<'a> EmptyFunctionVisitor<'a> {
                 column,
                 message: format!("Empty {} body", kind),
                 severity: Severity::Warning,
+                line_text: None,
             });
         }
     }

@@ -55,6 +55,7 @@ impl Rule for PreferConstRule {
                     column,
                     message: format!("'{}' is never reassigned, use 'const' instead", name),
                     severity: Severity::Warning,
+                    line_text: None,
                 });
             }
         }

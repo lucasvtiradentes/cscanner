@@ -71,6 +71,7 @@ impl<'a> ConsistentReturnVisitor<'a> {
                 column,
                 message: "Function has inconsistent return statements. Some return values, others don't.".to_string(),
                 severity: Severity::Warning,
+                line_text: None,
             });
         }
     }

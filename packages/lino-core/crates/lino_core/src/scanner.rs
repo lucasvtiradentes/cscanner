@@ -125,6 +125,7 @@ impl Scanner {
         };
 
         let enabled_rules = self.registry.get_enabled_rules(path, &self.config);
+        let source_lines: Vec<&str> = source.lines().collect();
 
         let issues: Vec<_> = enabled_rules
             .iter()
@@ -132,6 +133,9 @@ impl Scanner {
                 let mut rule_issues = rule.check(&program, path, &source);
                 for issue in &mut rule_issues {
                     issue.severity = *severity;
+                    if issue.line > 0 && issue.line <= source_lines.len() {
+                        issue.line_text = Some(source_lines[issue.line - 1].to_string());
+                    }
                 }
                 rule_issues
             })

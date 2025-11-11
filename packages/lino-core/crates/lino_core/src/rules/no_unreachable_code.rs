@@ -71,6 +71,7 @@ impl<'a> UnreachableCodeVisitor<'a> {
                     column,
                     message: "Unreachable code detected after return/throw/break/continue".to_string(),
                     severity: Severity::Error,
+                    line_text: None,
                 });
                 break;
             }

@@ -65,6 +65,7 @@ impl<'a> Visit for RelativeImportVisitor<'a> {
                     column,
                     message: format!("Use absolute imports with @ prefix instead of relative imports"),
                     severity: Severity::Warning,
+                    line_text: None,
                 });
             }
         }

@@ -61,6 +61,7 @@ impl<'a> Visit for NoVarVisitor<'a> {
                 column,
                 message: "Use 'let' or 'const' instead of 'var'".to_string(),
                 severity: Severity::Warning,
+                line_text: None,
             });
         }
         n.visit_children_with(self);

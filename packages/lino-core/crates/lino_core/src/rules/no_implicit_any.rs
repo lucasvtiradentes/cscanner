@@ -66,6 +66,7 @@ impl<'a> ImplicitAnyVisitor<'a> {
                             ident.id.sym
                         ),
                         severity: Severity::Error,
+                        line_text: None,
                     });
                 }
             }
@@ -81,6 +82,7 @@ impl<'a> ImplicitAnyVisitor<'a> {
                         column,
                         message: "Destructured parameter implicitly has 'any' type. Add type annotation.".to_string(),
                         severity: Severity::Error,
+                        line_text: None,
                     });
                 }
             }
@@ -96,6 +98,7 @@ impl<'a> ImplicitAnyVisitor<'a> {
                         column,
                         message: "Destructured parameter implicitly has 'any' type. Add type annotation.".to_string(),
                         severity: Severity::Error,
+                        line_text: None,
                     });
                 }
             }
@@ -111,6 +114,7 @@ impl<'a> ImplicitAnyVisitor<'a> {
                         column,
                         message: "Rest parameter implicitly has 'any' type. Add type annotation.".to_string(),
                         severity: Severity::Error,
+                        line_text: None,
                     });
                 }
             }
@@ -164,6 +168,7 @@ impl<'a> Visit for ImplicitAnyVisitor<'a> {
                                 ident.id.sym
                             ),
                             severity: Severity::Error,
+                            line_text: None,
                         });
                     }
                 }
@@ -179,6 +184,7 @@ impl<'a> Visit for ImplicitAnyVisitor<'a> {
                             column,
                             message: "Destructured parameter implicitly has 'any' type. Add type annotation.".to_string(),
                             severity: Severity::Error,
+                            line_text: None,
                         });
                     }
                 }
@@ -194,6 +200,7 @@ impl<'a> Visit for ImplicitAnyVisitor<'a> {
                             column,
                             message: "Destructured parameter implicitly has 'any' type. Add type annotation.".to_string(),
                             severity: Severity::Error,
+                            line_text: None,
                         });
                     }
                 }
@@ -209,6 +216,7 @@ impl<'a> Visit for ImplicitAnyVisitor<'a> {
                             column,
                             message: "Rest parameter implicitly has 'any' type. Add type annotation.".to_string(),
                             severity: Severity::Error,
+                            line_text: None,
                         });
                     }
                 }

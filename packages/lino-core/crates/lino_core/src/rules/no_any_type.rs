@@ -61,6 +61,7 @@ impl<'a> Visit for AnyTypeVisitor<'a> {
                 column,
                 message: "Found `: any` type annotation".to_string(),
                 severity: Severity::Error,
+                line_text: None,
             });
         }
         n.visit_children_with(self);
@@ -79,6 +80,7 @@ impl<'a> Visit for AnyTypeVisitor<'a> {
                     column,
                     message: "Found `as any` type assertion".to_string(),
                     severity: Severity::Error,
+                    line_text: None,
                 });
             }
         }

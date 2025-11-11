@@ -74,6 +74,7 @@ impl<'a> ConstantConditionVisitor<'a> {
                 column,
                 message: format!("Constant condition in {}", context),
                 severity: Severity::Error,
+                line_text: None,
             });
         }
     }

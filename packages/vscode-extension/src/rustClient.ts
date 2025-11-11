@@ -22,6 +22,7 @@ interface Issue {
   column: number;
   message: string;
   severity: 'Error' | 'Warning';
+  line_text?: string;
 }
 
 interface FileResult {
@@ -159,36 +160,23 @@ export class RustClient {
       logger.debug(`Filtered ${result.files.length} → ${filesToLoad.length} files to load (fileFilter has ${fileFilter.size} entries)`);
     }
 
-    logger.debug(`Loading ${filesToLoad.length} unique documents in parallel...`);
-
-    const docLoadStart = Date.now();
-    const documentCache = new Map<string, vscode.TextDocument>();
-
-    await Promise.all(
-      filesToLoad.map(async (filePath) => {
-        try {
-          const uri = vscode.Uri.file(filePath);
-          const document = await vscode.workspace.openTextDocument(uri);
-          documentCache.set(filePath, document);
-        } catch (error) {
-          logger.error(`Failed to load document: ${filePath}`);
-        }
-      })
-    );
-
-    const docLoadTime = Date.now() - docLoadStart;
-    logger.debug(`Loaded ${documentCache.size} documents in ${docLoadTime}ms`);
-
     const results: IssueResult[] = [];
 
     for (const fileResult of result.files) {
-      const document = documentCache.get(fileResult.file);
-      if (!document) continue;
-
       const uri = vscode.Uri.file(fileResult.file);
 
       for (const issue of fileResult.issues) {
-        const lineText = document.lineAt(issue.line - 1).text;
+        let lineText = issue.line_text || '';
+
+        if (!lineText && fileFilter && fileFilter.has(vscode.workspace.asRelativePath(uri))) {
+          try {
+            const document = await vscode.workspace.openTextDocument(uri);
+            lineText = document.lineAt(issue.line - 1).text;
+          } catch (error) {
+            logger.error(`Failed to load line text for: ${fileResult.file}`);
+            lineText = '';
+          }
+        }
 
         results.push({
           uri,

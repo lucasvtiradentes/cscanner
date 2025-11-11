@@ -63,6 +63,7 @@ impl<'a> Visit for MagicNumberVisitor<'a> {
                 column,
                 message: format!("Magic number '{}' found. Consider using a named constant instead", value),
                 severity: Severity::Warning,
+                line_text: None,
             });
         }
     }

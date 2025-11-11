@@ -73,6 +73,7 @@ impl<'a> Visit for DuplicateImportsVisitor<'a> {
                         module_name, first_line
                     ),
                     severity: Severity::Warning,
+                    line_text: None,
                 });
             } else {
                 let (line, _) = self.get_line_col(import_start);
