@@ -155,6 +155,10 @@ impl FileCache {
 
     pub fn clear(&self) {
         self.entries.clear();
+        if let Some(cache_dir) = &self.cache_dir {
+            let cache_file = cache_dir.join(format!("cache_{}.json", self.config_hash));
+            let _ = std::fs::remove_file(&cache_file);
+        }
     }
 
     pub fn len(&self) -> usize {

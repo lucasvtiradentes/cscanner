@@ -82,7 +82,7 @@ fn main() {
                 .with_level(true)
                 .with_timer(timer)
         )
-        .with(tracing_subscriber::filter::LevelFilter::INFO)
+        .with(tracing_subscriber::filter::LevelFilter::WARN)
         .init();
 
     info!("Lino server started");
@@ -327,6 +327,15 @@ fn handle_request(request: Request, state: &mut ServerState) -> Response {
             Response {
                 id: request.id,
                 result: Some(serde_json::to_value(&metadata).unwrap()),
+                error: None,
+            }
+        }
+        "clearCache" => {
+            info!("Clearing file cache");
+            state.cache.clear();
+            Response {
+                id: request.id,
+                result: Some(serde_json::json!({"cleared": true})),
                 error: None,
             }
         }

@@ -56,6 +56,11 @@
         "icon": "$(refresh)"
       },
       {
+        "command": "lino.hardScan",
+        "title": "Lino: Hard Scan (Clear Cache & Rescan)",
+        "icon": "$(debug-restart)"
+      },
+      {
         "command": "lino.setGroupByDefault",
         "title": "No Grouping",
         "icon": "$(close-all)"

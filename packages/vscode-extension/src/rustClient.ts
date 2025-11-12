@@ -81,7 +81,7 @@ export class RustClient {
         ...process.env,
         NO_COLOR: '1',
         RUST_LOG_STYLE: 'never',
-        RUST_LOG: 'lino_core=info,lino_server=info'
+        RUST_LOG: 'lino_core=warn,lino_server=info'
       }
     });
 
@@ -134,7 +134,7 @@ export class RustClient {
     this.process.stderr!.on('data', (data: Buffer) => {
       const text = data.toString().replace(/\x1b\[[0-9;]*m/g, '');
       if (text.trim()) {
-        logger.debug(`[Rust stderr] ${text}`);
+        logger.info(`[Rust stderr] ${text}`);
       }
     });
 
@@ -256,5 +256,10 @@ export class RustClient {
   async getRulesMetadata(): Promise<RuleMetadata[]> {
     const result = await this.sendRequest('getRulesMetadata', {});
     return result;
+  }
+
+  async clearCache(): Promise<void> {
+    await this.sendRequest('clearCache', {});
+    logger.info('Rust cache cleared');
   }
 }

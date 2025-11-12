@@ -131,6 +131,20 @@ export async function scanFile(filePath: string): Promise<IssueResult[]> {
   }
 }
 
+export async function clearCache(): Promise<void> {
+  if (!rustClient) {
+    const binaryPath = getRustBinaryPath();
+    if (!binaryPath) {
+      throw new Error('Rust binary not found');
+    }
+    rustClient = new RustClient(binaryPath);
+    await rustClient.start();
+  }
+
+  await rustClient.clearCache();
+  logger.info('Cache cleared via RPC');
+}
+
 export function dispose() {
   if (rustClient) {
     rustClient.stop();

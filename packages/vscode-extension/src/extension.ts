@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { SearchResultProvider } from './searchProvider';
-import { scanWorkspace, scanFile, dispose as disposeScanner } from './issueScanner';
+import { scanWorkspace, scanFile, clearCache, dispose as disposeScanner } from './issueScanner';
 import { logger } from './logger';
 import { getAllBranches, getChangedFiles, getCurrentBranch, invalidateCache } from './gitHelper';
 
@@ -520,6 +520,31 @@ export function activate(context: vscode.ExtensionContext) {
     await vscode.commands.executeCommand('lino.findIssue');
   });
 
+  const hardScanCommand = vscode.commands.registerCommand('lino.hardScan', async () => {
+    if (isSearching) {
+      vscode.window.showWarningMessage('Search already in progress');
+      return;
+    }
+
+    const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+    if (!workspaceFolder) {
+      vscode.window.showErrorMessage('No workspace folder open');
+      return;
+    }
+
+    logger.info('Starting hard scan (clearing cache)');
+
+    try {
+      await clearCache();
+      invalidateCache();
+      vscode.window.showInformationMessage('Cache cleared, rescanning...');
+      await vscode.commands.executeCommand('lino.findIssue');
+    } catch (error) {
+      logger.error(`Hard scan failed: ${error}`);
+      vscode.window.showErrorMessage(`Hard scan failed: ${error}`);
+    }
+  });
+
   const setGroupByDefaultCommand = vscode.commands.registerCommand('lino.setGroupByDefault', () => {
     searchProvider.groupMode = 'default';
     context.workspaceState.update('lino.groupMode', 'default');
@@ -634,6 +659,7 @@ export function activate(context: vscode.ExtensionContext) {
     setListViewCommand,
     setTreeViewCommand,
     refreshCommand,
+    hardScanCommand,
     setGroupByDefaultCommand,
     setGroupByRuleCommand,
     copyPathCommand,
