@@ -63,7 +63,7 @@ impl<'a> Visit for RelativeImportVisitor<'a> {
                     file: self.path.clone(),
                     line,
                     column,
-                    message: format!("Use absolute imports with @ prefix instead of relative imports"),
+                    message: "Use absolute imports with @ prefix instead of relative imports".to_string(),
                     severity: Severity::Warning,
                     line_text: None,
                 });

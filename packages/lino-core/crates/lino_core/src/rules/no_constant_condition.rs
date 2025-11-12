@@ -49,21 +49,21 @@ struct ConstantConditionVisitor<'a> {
 }
 
 impl<'a> ConstantConditionVisitor<'a> {
-    fn is_constant(&self, expr: &Expr) -> bool {
+    fn is_constant(expr: &Expr) -> bool {
         match expr {
             Expr::Lit(Lit::Bool(_)) => true,
             Expr::Lit(Lit::Num(_)) => true,
             Expr::Lit(Lit::Str(_)) => true,
             Expr::Lit(Lit::Null(_)) => true,
             Expr::Unary(unary) if matches!(unary.op, UnaryOp::Bang | UnaryOp::Minus | UnaryOp::Plus) => {
-                self.is_constant(&unary.arg)
+                Self::is_constant(&unary.arg)
             }
             _ => false,
         }
     }
 
     fn check_condition(&mut self, test: &Expr, context: &str) {
-        if self.is_constant(test) {
+        if Self::is_constant(test) {
             let span = test.span();
             let (line, column) = self.get_line_col(span.lo.0 as usize);
 

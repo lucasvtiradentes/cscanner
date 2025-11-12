@@ -50,10 +50,7 @@ struct UnreachableCodeVisitor<'a> {
 
 impl<'a> UnreachableCodeVisitor<'a> {
     fn is_terminating_stmt(&self, stmt: &Stmt) -> bool {
-        match stmt {
-            Stmt::Return(_) | Stmt::Throw(_) | Stmt::Break(_) | Stmt::Continue(_) => true,
-            _ => false,
-        }
+        matches!(stmt, Stmt::Return(_) | Stmt::Throw(_) | Stmt::Break(_) | Stmt::Continue(_))
     }
 
     fn check_block_statements(&mut self, stmts: &[Stmt]) {

@@ -41,6 +41,12 @@ pub struct FileCache {
     cache_dir: Option<PathBuf>,
 }
 
+impl Default for FileCache {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl FileCache {
     pub fn new() -> Self {
         Self {
@@ -163,6 +169,10 @@ impl FileCache {
 
     pub fn len(&self) -> usize {
         self.entries.len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.entries.is_empty()
     }
 
     pub fn flush(&self) {
