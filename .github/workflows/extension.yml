@@ -33,10 +33,10 @@ jobs:
         run: pnpm install
 
       - name: Build extension
-        run: pnpm --filter vscode-extension bundle:ci
+        run: pnpm --filter lino-vscode bundle:ci
 
       - name: Run tests
-        run: pnpm --filter vscode-extension test
+        run: pnpm --filter lino-vscode test
         if: false
 
   build:
@@ -59,7 +59,12 @@ jobs:
         run: pnpm install
 
       - name: Build extension
-        run: pnpm --filter vscode-extension bundle:ci
+        run: pnpm --filter lino-vscode bundle:ci
+
+      - name: Verify build output
+        run: |
+          ls -la packages/vscode-extension/out/
+          test -f packages/vscode-extension/out/extension.js || (echo "extension.js not found" && exit 1)
 
       - name: Package extension
         run: |

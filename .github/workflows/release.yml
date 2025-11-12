@@ -94,7 +94,7 @@ jobs:
         run: pnpm install
 
       - name: Build extension
-        run: pnpm --filter vscode-extension bundle
+        run: pnpm --filter lino-vscode bundle
 
       - name: Package extension
         run: |
