@@ -1,12 +1,12 @@
-use lino_core::{FileCache, FileWatcher, Scanner, LinoConfig};
+use base64::Engine;
+use flate2::write::GzEncoder;
+use flate2::Compression;
+use lino_core::{FileCache, FileWatcher, LinoConfig, Scanner};
 use serde::{Deserialize, Serialize};
 use std::io::{self, BufRead, Write};
 use std::path::PathBuf;
 use std::sync::Arc;
 use tracing::{error, info};
-use flate2::write::GzEncoder;
-use flate2::Compression;
-use base64::Engine;
 
 #[derive(Debug, Deserialize)]
 struct Request {
@@ -68,12 +68,12 @@ impl ServerState {
 }
 
 fn main() {
+    use time::macros::format_description;
+    use time::UtcOffset;
     use tracing_subscriber::fmt::time::OffsetTime;
     use tracing_subscriber::fmt::Layer;
     use tracing_subscriber::layer::SubscriberExt;
     use tracing_subscriber::util::SubscriberInitExt;
-    use time::UtcOffset;
-    use time::macros::format_description;
 
     let offset = UtcOffset::from_hms(-3, 0, 0).unwrap();
     let format = format_description!("[year]-[month]-[day]T[hour]:[minute]:[second].[subsecond digits:3][offset_hour sign:mandatory]:[offset_minute]");
@@ -86,7 +86,7 @@ fn main() {
                 .with_ansi(false)
                 .with_target(false)
                 .with_level(true)
-                .with_timer(timer)
+                .with_timer(timer),
         )
         .with(tracing_subscriber::filter::LevelFilter::WARN)
         .init();
@@ -163,7 +163,11 @@ fn main() {
                 let flush_time = flush_start.elapsed();
 
                 if write_time.as_millis() > 50 || flush_time.as_millis() > 50 {
-                    info!("Write took {}ms, flush took {}ms", write_time.as_millis(), flush_time.as_millis());
+                    info!(
+                        "Write took {}ms, flush took {}ms",
+                        write_time.as_millis(),
+                        flush_time.as_millis()
+                    );
                 }
             }
         }
@@ -310,7 +314,11 @@ fn handle_request(request: Request, state: &mut ServerState) -> Response {
 
             state.scanner = Some(scanner);
 
-            match state.scanner.as_ref().and_then(|s| s.scan_single(&params.file)) {
+            match state
+                .scanner
+                .as_ref()
+                .and_then(|s| s.scan_single(&params.file))
+            {
                 Some(result) => Response {
                     id: request.id,
                     result: Some(serde_json::to_value(&result).unwrap()),

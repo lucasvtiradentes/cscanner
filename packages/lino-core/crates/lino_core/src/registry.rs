@@ -1,5 +1,5 @@
 use crate::config::{CompiledRuleConfig, LinoConfig, RuleType};
-use crate::rules::{Rule, RegexRule, RuleRegistration};
+use crate::rules::{RegexRule, Rule, RuleRegistration};
 use crate::types::Severity;
 use std::collections::HashMap;
 use std::path::Path;
@@ -30,7 +30,9 @@ impl RuleRegistry {
         for (rule_name, rule_config) in &config.rules {
             if rule_config.rule_type == RuleType::Regex {
                 if let Some(pattern) = &rule_config.pattern {
-                    let message = rule_config.message.clone()
+                    let message = rule_config
+                        .message
+                        .clone()
                         .unwrap_or_else(|| format!("Rule '{}' matched", rule_name));
 
                     match RegexRule::new(
@@ -40,7 +42,9 @@ impl RuleRegistry {
                         rule_config.severity,
                     ) {
                         Ok(regex_rule) => {
-                            registry.rules.insert(rule_name.clone(), Arc::new(regex_rule));
+                            registry
+                                .rules
+                                .insert(rule_name.clone(), Arc::new(regex_rule));
                         }
                         Err(e) => {
                             tracing::error!("Failed to compile regex rule '{}': {}", rule_name, e);
@@ -51,12 +55,22 @@ impl RuleRegistry {
             }
 
             if let Ok(compiled) = config.compile_rule(rule_name) {
-                registry.compiled_configs.insert(rule_name.clone(), compiled);
+                registry
+                    .compiled_configs
+                    .insert(rule_name.clone(), compiled);
             }
         }
 
-        let enabled_count = registry.compiled_configs.values().filter(|c| c.enabled).count();
-        tracing::info!("Loaded {} rules ({} enabled)", registry.rules.len(), enabled_count);
+        let enabled_count = registry
+            .compiled_configs
+            .values()
+            .filter(|c| c.enabled)
+            .count();
+        tracing::info!(
+            "Loaded {} rules ({} enabled)",
+            registry.rules.len(),
+            enabled_count
+        );
 
         Ok(registry)
     }
@@ -69,7 +83,11 @@ impl RuleRegistry {
         self.rules.get(name).cloned()
     }
 
-    pub fn get_enabled_rules(&self, file_path: &Path, config: &LinoConfig) -> Vec<(Arc<dyn Rule>, Severity)> {
+    pub fn get_enabled_rules(
+        &self,
+        file_path: &Path,
+        config: &LinoConfig,
+    ) -> Vec<(Arc<dyn Rule>, Severity)> {
         self.rules
             .iter()
             .filter_map(|(name, rule)| {

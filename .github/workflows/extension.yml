@@ -33,7 +33,7 @@ jobs:
         run: pnpm install
 
       - name: Build extension
-        run: pnpm --filter vscode-extension bundle
+        run: pnpm --filter vscode-extension bundle:ci
 
       - name: Run tests
         run: pnpm --filter vscode-extension test
@@ -59,7 +59,7 @@ jobs:
         run: pnpm install
 
       - name: Build extension
-        run: pnpm --filter vscode-extension bundle
+        run: pnpm --filter vscode-extension bundle:ci
 
       - name: Package extension
         run: |

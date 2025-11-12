@@ -20,16 +20,15 @@ impl FileWatcher {
     pub fn new(root: &Path) -> Result<Self, notify::Error> {
         let (tx, rx) = channel();
 
-        let mut watcher = notify::recommended_watcher(move |res: Result<Event, notify::Error>| {
-            match res {
+        let mut watcher =
+            notify::recommended_watcher(move |res: Result<Event, notify::Error>| match res {
                 Ok(event) => {
                     if let Err(e) = Self::handle_event(event, &tx) {
                         error!("Error handling file event: {}", e);
                     }
                 }
                 Err(e) => error!("Watch error: {:?}", e),
-            }
-        })?;
+            })?;
 
         watcher.watch(root, RecursiveMode::Recursive)?;
 
@@ -39,7 +38,10 @@ impl FileWatcher {
         })
     }
 
-    fn handle_event(event: Event, tx: &Sender<FileEvent>) -> Result<(), Box<dyn std::error::Error>> {
+    fn handle_event(
+        event: Event,
+        tx: &Sender<FileEvent>,
+    ) -> Result<(), Box<dyn std::error::Error>> {
         for path in event.paths {
             if !Self::should_watch(&path) {
                 continue;

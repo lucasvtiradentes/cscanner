@@ -178,6 +178,7 @@
     "watch": "tsc -watch -p ./",
     "dev": "esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node --watch",
     "bundle": "node extension-scripts/postinstall.js && esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node --minify",
+    "bundle:ci": "esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node --minify",
     "build": "pnpm run bundle",
     "postbuild": "tsx extension-scripts/install-local.ts",
     "postinstall": "node extension-scripts/postinstall.js"

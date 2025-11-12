@@ -1,11 +1,8 @@
-use swc_common::{
-    sync::Lrc,
-    SourceMap, FileName,
-};
+use anyhow::Result;
+use std::path::Path;
+use swc_common::{sync::Lrc, FileName, SourceMap};
 use swc_ecma_ast::Program;
 use swc_ecma_parser::{lexer::Lexer, Parser, StringInput, Syntax, TsSyntax};
-use std::path::Path;
-use anyhow::Result;
 
 pub fn parse_file(path: &Path, source: &str) -> Result<Program> {
     let cm: Lrc<SourceMap> = Default::default();

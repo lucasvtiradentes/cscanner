@@ -1,6 +1,6 @@
-use serde::{Deserialize, Serialize};
 use crate::config::RuleType;
 use crate::types::Severity;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]

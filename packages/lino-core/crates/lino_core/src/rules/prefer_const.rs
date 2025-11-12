@@ -1,12 +1,12 @@
-use crate::types::{Issue, Severity};
-use crate::rules::{Rule, RuleRegistration, RuleMetadata, RuleMetadataRegistration, RuleCategory};
 use crate::config::RuleType;
-use swc_common::Spanned;
-use swc_ecma_ast::*;
-use swc_ecma_visit::{Visit, VisitWith};
+use crate::rules::{Rule, RuleCategory, RuleMetadata, RuleMetadataRegistration, RuleRegistration};
+use crate::types::{Issue, Severity};
 use std::collections::{HashMap, HashSet};
 use std::path::Path;
 use std::sync::Arc;
+use swc_common::Spanned;
+use swc_ecma_ast::*;
+use swc_ecma_visit::{Visit, VisitWith};
 
 pub struct PreferConstRule;
 

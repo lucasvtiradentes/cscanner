@@ -1,7 +1,7 @@
 use crate::types::Issue;
-use swc_ecma_ast::Program;
 use std::path::Path;
 use std::sync::Arc;
+use swc_ecma_ast::Program;
 
 pub trait Rule: Send + Sync {
     fn name(&self) -> &str;
@@ -15,21 +15,21 @@ pub struct RuleRegistration {
 
 inventory::collect!(RuleRegistration);
 
+mod consistent_return;
 mod metadata;
-mod regex_rule;
 mod no_any_type;
 mod no_console_log;
-mod no_relative_imports;
-mod prefer_type_over_interface;
-mod no_magic_numbers;
-mod no_var;
 mod no_constant_condition;
 mod no_duplicate_imports;
-mod no_unreachable_code;
-mod prefer_const;
-mod no_implicit_any;
-mod consistent_return;
 mod no_empty_function;
+mod no_implicit_any;
+mod no_magic_numbers;
+mod no_relative_imports;
+mod no_unreachable_code;
+mod no_var;
+mod prefer_const;
+mod prefer_type_over_interface;
+mod regex_rule;
 
-pub use metadata::{RuleMetadata, RuleMetadataRegistration, RuleCategory, get_all_rule_metadata};
+pub use metadata::{get_all_rule_metadata, RuleCategory, RuleMetadata, RuleMetadataRegistration};
 pub use regex_rule::RegexRule;

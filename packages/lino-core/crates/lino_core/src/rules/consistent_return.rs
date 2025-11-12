@@ -1,10 +1,10 @@
-use crate::types::{Issue, Severity};
-use crate::rules::{Rule, RuleRegistration, RuleMetadata, RuleMetadataRegistration, RuleCategory};
 use crate::config::RuleType;
-use swc_ecma_ast::*;
-use swc_ecma_visit::{Visit, VisitWith};
+use crate::rules::{Rule, RuleCategory, RuleMetadata, RuleMetadataRegistration, RuleRegistration};
+use crate::types::{Issue, Severity};
 use std::path::Path;
 use std::sync::Arc;
+use swc_ecma_ast::*;
+use swc_ecma_visit::{Visit, VisitWith};
 
 pub struct ConsistentReturnRule;
 
@@ -69,7 +69,9 @@ impl<'a> ConsistentReturnVisitor<'a> {
                 file: self.path.clone(),
                 line,
                 column,
-                message: "Function has inconsistent return statements. Some return values, others don't.".to_string(),
+                message:
+                    "Function has inconsistent return statements. Some return values, others don't."
+                        .to_string(),
                 severity: Severity::Warning,
                 line_text: None,
             });

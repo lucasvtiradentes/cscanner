@@ -1,10 +1,10 @@
+use crate::types::Severity;
 use globset::{Glob, GlobSet, GlobSetBuilder};
 use serde::{Deserialize, Serialize};
-use std::collections::{HashMap, BTreeMap};
-use std::hash::{Hash, Hasher};
 use std::collections::hash_map::DefaultHasher;
+use std::collections::{BTreeMap, HashMap};
+use std::hash::{Hash, Hasher};
 use std::path::Path;
-use crate::types::Severity;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LinoConfig {
@@ -92,8 +92,13 @@ impl LinoConfig {
         }
     }
 
-    pub fn compile_rule(&self, name: &str) -> Result<CompiledRuleConfig, Box<dyn std::error::Error>> {
-        let rule_config = self.rules.get(name)
+    pub fn compile_rule(
+        &self,
+        name: &str,
+    ) -> Result<CompiledRuleConfig, Box<dyn std::error::Error>> {
+        let rule_config = self
+            .rules
+            .get(name)
             .ok_or_else(|| format!("Rule '{}' not found in configuration", name))?;
 
         let include = compile_globs(&rule_config.include, &self.include)?;
@@ -138,16 +143,19 @@ impl Default for LinoConfig {
     fn default() -> Self {
         let mut rules = HashMap::new();
 
-        rules.insert("no-any-type".to_string(), RuleConfig {
-            enabled: true,
-            rule_type: RuleType::Ast,
-            severity: Severity::Error,
-            include: vec![],
-            exclude: vec![],
-            message: Some("Found 'any' type annotation".to_string()),
-            pattern: None,
-            options: HashMap::new(),
-        });
+        rules.insert(
+            "no-any-type".to_string(),
+            RuleConfig {
+                enabled: true,
+                rule_type: RuleType::Ast,
+                severity: Severity::Error,
+                include: vec![],
+                exclude: vec![],
+                message: Some("Found 'any' type annotation".to_string()),
+                pattern: None,
+                options: HashMap::new(),
+            },
+        );
 
         Self {
             rules,

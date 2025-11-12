@@ -28,9 +28,16 @@ impl Scanner {
         })
     }
 
-    pub fn with_cache(config: LinoConfig, cache: Arc<FileCache>) -> Result<Self, Box<dyn std::error::Error>> {
+    pub fn with_cache(
+        config: LinoConfig,
+        cache: Arc<FileCache>,
+    ) -> Result<Self, Box<dyn std::error::Error>> {
         let registry = RuleRegistry::with_config(&config)?;
-        Ok(Self { registry, config, cache })
+        Ok(Self {
+            registry,
+            config,
+            cache,
+        })
     }
 
     pub fn scan(&self, root: &Path) -> ScanResult {

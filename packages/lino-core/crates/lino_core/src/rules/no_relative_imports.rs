@@ -1,10 +1,10 @@
-use crate::types::{Issue, Severity};
-use crate::rules::{Rule, RuleRegistration, RuleMetadata, RuleMetadataRegistration, RuleCategory};
 use crate::config::RuleType;
-use swc_ecma_ast::*;
-use swc_ecma_visit::{Visit, VisitWith};
+use crate::rules::{Rule, RuleCategory, RuleMetadata, RuleMetadataRegistration, RuleRegistration};
+use crate::types::{Issue, Severity};
 use std::path::Path;
 use std::sync::Arc;
+use swc_ecma_ast::*;
+use swc_ecma_visit::{Visit, VisitWith};
 
 pub struct NoRelativeImportsRule;
 
@@ -55,7 +55,11 @@ impl<'a> Visit for RelativeImportVisitor<'a> {
 
         if import_start < self.source.len() && import_end <= self.source.len() {
             let src_slice = &self.source[import_start..import_end];
-            if src_slice.trim_matches('"').trim_matches('\'').starts_with('.') {
+            if src_slice
+                .trim_matches('"')
+                .trim_matches('\'')
+                .starts_with('.')
+            {
                 let (line, column) = self.get_line_col(import_start);
 
                 self.issues.push(Issue {
@@ -63,7 +67,8 @@ impl<'a> Visit for RelativeImportVisitor<'a> {
                     file: self.path.clone(),
                     line,
                     column,
-                    message: "Use absolute imports with @ prefix instead of relative imports".to_string(),
+                    message: "Use absolute imports with @ prefix instead of relative imports"
+                        .to_string(),
                     severity: Severity::Warning,
                     line_text: None,
                 });

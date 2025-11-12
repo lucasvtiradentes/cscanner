@@ -1,10 +1,10 @@
-use crate::types::{Issue, Severity};
-use crate::rules::{Rule, RuleRegistration, RuleMetadata, RuleMetadataRegistration, RuleCategory};
 use crate::config::RuleType;
-use swc_ecma_ast::Program;
+use crate::rules::{Rule, RuleCategory, RuleMetadata, RuleMetadataRegistration, RuleRegistration};
+use crate::types::{Issue, Severity};
+use regex::Regex;
 use std::path::Path;
 use std::sync::Arc;
-use regex::Regex;
+use swc_ecma_ast::Program;
 
 pub struct NoConsoleLogRule;
 

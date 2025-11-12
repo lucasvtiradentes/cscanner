@@ -1,17 +1,17 @@
-pub mod scanner;
-pub mod parser;
-pub mod rules;
-pub mod types;
 pub mod cache;
-pub mod watcher;
 pub mod config;
+pub mod parser;
 pub mod registry;
+pub mod rules;
+pub mod scanner;
+pub mod types;
+pub mod watcher;
 
-pub use scanner::Scanner;
-pub use parser::parse_file;
-pub use rules::{Rule, RegexRule, RuleMetadata, RuleCategory, get_all_rule_metadata};
-pub use types::{Issue, Severity, FileResult, ScanResult};
 pub use cache::FileCache;
-pub use watcher::FileWatcher;
-pub use config::{LinoConfig, RuleConfig, RuleType, CompiledRuleConfig};
+pub use config::{CompiledRuleConfig, LinoConfig, RuleConfig, RuleType};
+pub use parser::parse_file;
 pub use registry::RuleRegistry;
+pub use rules::{get_all_rule_metadata, RegexRule, Rule, RuleCategory, RuleMetadata};
+pub use scanner::Scanner;
+pub use types::{FileResult, Issue, ScanResult, Severity};
+pub use watcher::FileWatcher;

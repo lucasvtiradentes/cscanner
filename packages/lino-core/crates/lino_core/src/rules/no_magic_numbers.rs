@@ -1,11 +1,11 @@
-use crate::types::{Issue, Severity};
-use crate::rules::{Rule, RuleRegistration, RuleMetadata, RuleMetadataRegistration, RuleCategory};
 use crate::config::RuleType;
+use crate::rules::{Rule, RuleCategory, RuleMetadata, RuleMetadataRegistration, RuleRegistration};
+use crate::types::{Issue, Severity};
+use std::path::Path;
+use std::sync::Arc;
 use swc_common::Spanned;
 use swc_ecma_ast::*;
 use swc_ecma_visit::{Visit, VisitWith};
-use std::path::Path;
-use std::sync::Arc;
 
 pub struct NoMagicNumbersRule;
 
@@ -61,7 +61,10 @@ impl<'a> Visit for MagicNumberVisitor<'a> {
                 file: self.path.clone(),
                 line,
                 column,
-                message: format!("Magic number '{}' found. Consider using a named constant instead", value),
+                message: format!(
+                    "Magic number '{}' found. Consider using a named constant instead",
+                    value
+                ),
                 severity: Severity::Warning,
                 line_text: None,
             });

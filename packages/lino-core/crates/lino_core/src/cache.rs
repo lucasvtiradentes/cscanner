@@ -1,10 +1,10 @@
 use crate::types::Issue;
 use dashmap::DashMap;
+use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::time::SystemTime;
 use tracing::info;
-use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Serialize, Deserialize)]
 struct CacheEntry {
@@ -86,21 +86,19 @@ impl FileCache {
         }
 
         match fs::read_to_string(&cache_file) {
-            Ok(content) => {
-                match serde_json::from_str::<Vec<(PathBuf, CacheEntry)>>(&content) {
-                    Ok(entries) => {
-                        let mut loaded = 0;
-                        for (path, entry) in entries {
-                            if entry.config_hash == config_hash {
-                                self.entries.insert(path, entry);
-                                loaded += 1;
-                            }
+            Ok(content) => match serde_json::from_str::<Vec<(PathBuf, CacheEntry)>>(&content) {
+                Ok(entries) => {
+                    let mut loaded = 0;
+                    for (path, entry) in entries {
+                        if entry.config_hash == config_hash {
+                            self.entries.insert(path, entry);
+                            loaded += 1;
                         }
-                        info!("Loaded {} cache entries", loaded);
                     }
-                    Err(e) => info!("Failed to parse cache: {}", e),
+                    info!("Loaded {} cache entries", loaded);
                 }
-            }
+                Err(e) => info!("Failed to parse cache: {}", e),
+            },
             Err(e) => info!("Failed to read cache: {}", e),
         }
     }
@@ -109,7 +107,8 @@ impl FileCache {
         if let Some(cache_dir) = &self.cache_dir {
             let cache_file = cache_dir.join(format!("cache_{}.json", self.config_hash));
 
-            let entries: Vec<(PathBuf, CacheEntry)> = self.entries
+            let entries: Vec<(PathBuf, CacheEntry)> = self
+                .entries
                 .iter()
                 .map(|entry| (entry.key().clone(), entry.value().clone()))
                 .collect();
@@ -129,8 +128,15 @@ impl FileCache {
         let mtime = metadata.modified().ok()?;
 
         if let Some(entry) = self.entries.get(path) {
-            let cached_secs = entry.mtime.duration_since(std::time::UNIX_EPOCH).unwrap().as_secs();
-            let current_secs = mtime.duration_since(std::time::UNIX_EPOCH).unwrap().as_secs();
+            let cached_secs = entry
+                .mtime
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_secs();
+            let current_secs = mtime
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_secs();
 
             if cached_secs == current_secs && entry.config_hash == self.config_hash {
                 return Some(entry.issues.clone());

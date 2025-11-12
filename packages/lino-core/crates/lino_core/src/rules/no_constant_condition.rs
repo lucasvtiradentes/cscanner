@@ -1,11 +1,11 @@
-use crate::types::{Issue, Severity};
-use crate::rules::{Rule, RuleRegistration, RuleMetadata, RuleMetadataRegistration, RuleCategory};
 use crate::config::RuleType;
+use crate::rules::{Rule, RuleCategory, RuleMetadata, RuleMetadataRegistration, RuleRegistration};
+use crate::types::{Issue, Severity};
+use std::path::Path;
+use std::sync::Arc;
 use swc_common::Spanned;
 use swc_ecma_ast::*;
 use swc_ecma_visit::{Visit, VisitWith};
-use std::path::Path;
-use std::sync::Arc;
 
 pub struct NoConstantConditionRule;
 
@@ -55,7 +55,9 @@ impl<'a> ConstantConditionVisitor<'a> {
             Expr::Lit(Lit::Num(_)) => true,
             Expr::Lit(Lit::Str(_)) => true,
             Expr::Lit(Lit::Null(_)) => true,
-            Expr::Unary(unary) if matches!(unary.op, UnaryOp::Bang | UnaryOp::Minus | UnaryOp::Plus) => {
+            Expr::Unary(unary)
+                if matches!(unary.op, UnaryOp::Bang | UnaryOp::Minus | UnaryOp::Plus) =>
+            {
                 Self::is_constant(&unary.arg)
             }
             _ => false,

@@ -1,8 +1,8 @@
-use crate::types::{Issue, Severity};
 use crate::rules::Rule;
-use swc_ecma_ast::Program;
-use std::path::Path;
+use crate::types::{Issue, Severity};
 use regex::Regex;
+use std::path::Path;
+use swc_ecma_ast::Program;
 
 pub struct RegexRule {
     name: String,
@@ -12,7 +12,12 @@ pub struct RegexRule {
 }
 
 impl RegexRule {
-    pub fn new(name: String, pattern: String, message: String, severity: Severity) -> Result<Self, regex::Error> {
+    pub fn new(
+        name: String,
+        pattern: String,
+        message: String,
+        severity: Severity,
+    ) -> Result<Self, regex::Error> {
         Ok(Self {
             name,
             pattern: Regex::new(&pattern)?,

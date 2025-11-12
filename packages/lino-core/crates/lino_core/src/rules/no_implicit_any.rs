@@ -1,11 +1,11 @@
-use crate::types::{Issue, Severity};
-use crate::rules::{Rule, RuleRegistration, RuleMetadata, RuleMetadataRegistration, RuleCategory};
 use crate::config::RuleType;
+use crate::rules::{Rule, RuleCategory, RuleMetadata, RuleMetadataRegistration, RuleRegistration};
+use crate::types::{Issue, Severity};
+use std::path::Path;
+use std::sync::Arc;
 use swc_common::Spanned;
 use swc_ecma_ast::*;
 use swc_ecma_visit::{Visit, VisitWith};
-use std::path::Path;
-use std::sync::Arc;
 
 pub struct NoImplicitAnyRule;
 
@@ -18,7 +18,8 @@ inventory::submit!(RuleMetadataRegistration {
     metadata: RuleMetadata {
         name: "no-implicit-any",
         display_name: "No Implicit Any",
-        description: "Detects function parameters without type annotations that implicitly have 'any' type.",
+        description:
+            "Detects function parameters without type annotations that implicitly have 'any' type.",
         rule_type: RuleType::Ast,
         default_severity: Severity::Error,
         default_enabled: false,
@@ -52,9 +53,19 @@ struct ImplicitAnyVisitor<'a> {
 
 fn is_array_method(method_name: &str) -> bool {
     const ARRAY_METHODS: &[&str] = &[
-        "map", "filter", "forEach", "reduce", "reduceRight",
-        "find", "findIndex", "some", "every", "flatMap",
-        "sort", "findLast", "findLastIndex"
+        "map",
+        "filter",
+        "forEach",
+        "reduce",
+        "reduceRight",
+        "find",
+        "findIndex",
+        "some",
+        "every",
+        "flatMap",
+        "sort",
+        "findLast",
+        "findLastIndex",
     ];
     ARRAY_METHODS.contains(&method_name)
 }
@@ -104,7 +115,9 @@ impl<'a> ImplicitAnyVisitor<'a> {
                         file: self.path.clone(),
                         line,
                         column,
-                        message: "Destructured parameter implicitly has 'any' type. Add type annotation.".to_string(),
+                        message:
+                            "Destructured parameter implicitly has 'any' type. Add type annotation."
+                                .to_string(),
                         severity: Severity::Error,
                         line_text: None,
                     });
@@ -120,7 +133,9 @@ impl<'a> ImplicitAnyVisitor<'a> {
                         file: self.path.clone(),
                         line,
                         column,
-                        message: "Destructured parameter implicitly has 'any' type. Add type annotation.".to_string(),
+                        message:
+                            "Destructured parameter implicitly has 'any' type. Add type annotation."
+                                .to_string(),
                         severity: Severity::Error,
                         line_text: None,
                     });
@@ -136,7 +151,8 @@ impl<'a> ImplicitAnyVisitor<'a> {
                         file: self.path.clone(),
                         line,
                         column,
-                        message: "Rest parameter implicitly has 'any' type. Add type annotation.".to_string(),
+                        message: "Rest parameter implicitly has 'any' type. Add type annotation."
+                            .to_string(),
                         severity: Severity::Error,
                         line_text: None,
                     });
@@ -239,7 +255,9 @@ impl<'a> Visit for ImplicitAnyVisitor<'a> {
                                 file: self.path.clone(),
                                 line,
                                 column,
-                                message: "Rest parameter implicitly has 'any' type. Add type annotation.".to_string(),
+                                message:
+                                    "Rest parameter implicitly has 'any' type. Add type annotation."
+                                        .to_string(),
                                 severity: Severity::Error,
                                 line_text: None,
                             });
@@ -253,9 +271,10 @@ impl<'a> Visit for ImplicitAnyVisitor<'a> {
     }
 
     fn visit_call_expr(&mut self, n: &CallExpr) {
-        let has_arrow_callback = n.args.iter().any(|arg| {
-            matches!(arg.expr.as_ref(), Expr::Arrow(_))
-        });
+        let has_arrow_callback = n
+            .args
+            .iter()
+            .any(|arg| matches!(arg.expr.as_ref(), Expr::Arrow(_)));
 
         if has_arrow_callback {
             let prev_context = self.in_inferred_context;
