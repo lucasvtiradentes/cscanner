@@ -46,7 +46,7 @@ export function registerAllCommands(ctx: CommandContext): vscode.Disposable[] {
       ctx.currentScanModeRef,
       ctx.currentCompareBranchRef
     ),
-    createManageRulesCommand(ctx.updateStatusBar),
+    createManageRulesCommand(ctx.updateStatusBar, ctx.context),
     createOpenSettingsMenuCommand(
       ctx.updateStatusBar,
       ctx.currentScanModeRef,

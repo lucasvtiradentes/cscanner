@@ -2,6 +2,15 @@ import * as vscode from 'vscode';
 import { RustClient } from '../lib/rust-client';
 import { getRustBinaryPath } from '../lib/scanner';
 import { logger } from '../utils/logger';
+import {
+  loadEffectiveConfig,
+  saveGlobalConfig,
+  saveLocalConfig,
+  shouldSyncToLocal,
+  syncGlobalToLocal,
+  getDefaultConfig,
+  LinoConfig
+} from '../lib/config-manager';
 
 interface RuleQuickPickItem extends vscode.QuickPickItem {
   ruleName: string;
@@ -9,13 +18,18 @@ interface RuleQuickPickItem extends vscode.QuickPickItem {
   isCustom: boolean;
 }
 
-export function createManageRulesCommand(updateStatusBar: () => Promise<void>) {
+export function createManageRulesCommand(
+  updateStatusBar: () => Promise<void>,
+  context: vscode.ExtensionContext
+) {
   return vscode.commands.registerCommand('lino.manageRules', async () => {
     const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
     if (!workspaceFolder) {
       vscode.window.showErrorMessage('No workspace folder open');
       return;
     }
+
+    const workspacePath = workspaceFolder.uri.fsPath;
 
     const binaryPath = getRustBinaryPath();
     if (!binaryPath) {
@@ -29,16 +43,7 @@ export function createManageRulesCommand(updateStatusBar: () => Promise<void>) {
     try {
       const rules = await client.getRulesMetadata();
 
-      const configDir = vscode.Uri.joinPath(workspaceFolder.uri, '.lino');
-      const configPath = vscode.Uri.joinPath(configDir, 'rules.json');
-      let existingConfig: any = null;
-
-      try {
-        const configData = await vscode.workspace.fs.readFile(configPath);
-        existingConfig = JSON.parse(Buffer.from(configData).toString('utf8'));
-      } catch {
-        existingConfig = null;
-      }
+      const existingConfig = await loadEffectiveConfig(context, workspacePath) || getDefaultConfig();
 
       const builtinRuleNames = new Set(rules.map(r => r.name));
       const customRules: RuleQuickPickItem[] = [];
@@ -99,11 +104,7 @@ export function createManageRulesCommand(updateStatusBar: () => Promise<void>) {
           .map(item => item.ruleName)
       );
 
-      const config: any = existingConfig || {
-        rules: {},
-        include: ['**/*.ts', '**/*.tsx'],
-        exclude: ['**/node_modules/**', '**/dist/**', '**/build/**', '**/.git/**']
-      };
+      const config: LinoConfig = existingConfig;
 
       if (!config.rules) {
         config.rules = {};
@@ -129,11 +130,16 @@ export function createManageRulesCommand(updateStatusBar: () => Promise<void>) {
         }
       }
 
-      await vscode.workspace.fs.createDirectory(configDir);
-      await vscode.workspace.fs.writeFile(
-        configPath,
-        Buffer.from(JSON.stringify(config, null, 2))
-      );
+      await saveGlobalConfig(context, workspacePath, config);
+
+      const shouldSync = await shouldSyncToLocal(workspacePath);
+      if (shouldSync) {
+        await syncGlobalToLocal(context, workspacePath);
+        logger.info('Saved rules to global config and synced to local .lino/rules.json');
+      } else {
+        await saveLocalConfig(workspacePath, config);
+        logger.info('Saved rules to user-managed local .lino/rules.json');
+      }
 
       await client.stop();
 
