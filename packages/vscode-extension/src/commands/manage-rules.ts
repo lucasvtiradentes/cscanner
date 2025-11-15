@@ -159,9 +159,7 @@ export function createManageRulesCommand(
             enabled: true,
             type: rule.ruleType,
             severity: rule.defaultSeverity,
-            message: null,
-            include: [],
-            exclude: []
+            message: null
           };
           config.rules[rule.name].enabled = true;
         } else {

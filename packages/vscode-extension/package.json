@@ -130,6 +130,11 @@
         "command": "lino.goToPreviousIssue",
         "title": "Lino: Go to Previous Issue",
         "icon": "$(arrow-up)"
+      },
+      {
+        "command": "lino.showLogs",
+        "title": "Lino: Show Logs",
+        "icon": "$(output)"
       }
     ],
     "keybindings": [

@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { SearchResultProvider } from './ui/search-provider';
-import { dispose as disposeScanner } from './lib/scanner';
+import { dispose as disposeScanner, scanContent } from './lib/scanner';
 import { logger } from './utils/logger';
 import { getChangedFiles, invalidateCache, getModifiedLineRanges } from './utils/git-helper';
 import { getNewIssues } from './utils/issue-comparator';
@@ -130,7 +130,6 @@ export function activate(context: vscode.ExtensionContext) {
       const document = await vscode.workspace.openTextDocument(uri);
       const content = document.getText();
       const config = await loadEffectiveConfig(context, workspaceFolder.uri.fsPath);
-      const { scanContent } = await import('./lib/scanner');
       let newResults = await scanContent(uri.fsPath, content, config);
 
       if (currentScanModeRef.current === 'branch') {

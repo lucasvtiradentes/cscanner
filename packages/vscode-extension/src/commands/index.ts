@@ -23,6 +23,7 @@ import {
   createGoToPreviousIssueCommand,
   resetIssueIndex
 } from './issue-navigation';
+import { createShowLogsCommand } from './show-logs';
 
 export interface CommandContext {
   searchProvider: SearchResultProvider;
@@ -65,7 +66,8 @@ export function registerAllCommands(ctx: CommandContext): vscode.Disposable[] {
     createRefreshCommand(),
     createHardScanCommand(ctx.isSearchingRef),
     createGoToNextIssueCommand(ctx.searchProvider),
-    createGoToPreviousIssueCommand(ctx.searchProvider)
+    createGoToPreviousIssueCommand(ctx.searchProvider),
+    createShowLogsCommand()
   ];
 }
 
