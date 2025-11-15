@@ -18,6 +18,19 @@ interface RuleQuickPickItem extends vscode.QuickPickItem {
   isCustom: boolean;
 }
 
+function getCategoryIcon(category: string): string {
+  const icons: Record<string, string> = {
+    typesafety: 'shield',
+    variables: 'symbol-variable',
+    imports: 'package',
+    codequality: 'beaker',
+    bugprevention: 'bug',
+    style: 'symbol-color',
+    performance: 'dashboard'
+  };
+  return icons[category] || 'circle-outline';
+}
+
 export function createManageRulesCommand(
   updateStatusBar: () => Promise<void>,
   context: vscode.ExtensionContext
@@ -47,7 +60,6 @@ export function createManageRulesCommand(
 
       const builtinRuleNames = new Set(rules.map(r => r.name));
       const customRules: RuleQuickPickItem[] = [];
-      const defaultRules: RuleQuickPickItem[] = [];
 
       if (existingConfig?.rules) {
         for (const [ruleName, ruleConfig] of Object.entries(existingConfig.rules)) {
@@ -64,28 +76,55 @@ export function createManageRulesCommand(
         }
       }
 
+      const rulesByCategory = new Map<string, RuleQuickPickItem[]>();
+
       for (const rule of rules) {
         const existingRule = existingConfig?.rules?.[rule.name];
         const isEnabled = existingRule?.enabled ?? false;
 
-        defaultRules.push({
-          label: `$(${rule.category === 'typesafety' ? 'shield' : rule.category === 'codequality' ? 'beaker' : 'symbol-color'}) ${rule.displayName}`,
+        const ruleItem: RuleQuickPickItem = {
+          label: `$(${getCategoryIcon(rule.category)}) ${rule.displayName}`,
           description: `[${rule.ruleType.toUpperCase()}] ${rule.defaultSeverity}`,
           detail: rule.description,
           ruleName: rule.name,
           picked: isEnabled,
           isCustom: false
-        });
+        };
+
+        const category = rule.category;
+        if (!rulesByCategory.has(category)) {
+          rulesByCategory.set(category, []);
+        }
+        rulesByCategory.get(category)!.push(ruleItem);
       }
+
+      const categoryOrder = ['typesafety', 'variables', 'imports', 'codequality', 'bugprevention', 'style', 'performance'];
+      const categoryLabels: Record<string, string> = {
+        typesafety: 'Type Safety',
+        variables: 'Variables',
+        imports: 'Imports',
+        codequality: 'Code Quality',
+        bugprevention: 'Bug Prevention',
+        style: 'Style',
+        performance: 'Performance'
+      };
 
       const items: RuleQuickPickItem[] = [
         ...(customRules.length > 0 ? [
           { label: 'Custom Rules', kind: vscode.QuickPickItemKind.Separator } as any,
           ...customRules
-        ] : []),
-        { label: 'Default Rules', kind: vscode.QuickPickItemKind.Separator } as any,
-        ...defaultRules
+        ] : [])
       ];
+
+      for (const category of categoryOrder) {
+        const categoryRules = rulesByCategory.get(category);
+        if (categoryRules && categoryRules.length > 0) {
+          items.push(
+            { label: categoryLabels[category], kind: vscode.QuickPickItemKind.Separator } as any,
+            ...categoryRules
+          );
+        }
+      }
 
       const selected = await vscode.window.showQuickPick(items, {
         placeHolder: 'Select rules to enable (Space to toggle, Enter to confirm)',

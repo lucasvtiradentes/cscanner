@@ -23,7 +23,7 @@ inventory::submit!(RuleMetadataRegistration {
         rule_type: RuleType::Ast,
         default_severity: Severity::Warning,
         default_enabled: false,
-        category: RuleCategory::CodeQuality,
+        category: RuleCategory::Variables,
     }
 });
 

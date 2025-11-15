@@ -22,6 +22,8 @@ pub enum RuleCategory {
     Style,
     Performance,
     BugPrevention,
+    Variables,
+    Imports,
 }
 
 pub struct RuleMetadataRegistration {
