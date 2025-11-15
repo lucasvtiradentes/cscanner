@@ -1,6 +1,7 @@
 use crate::config::RuleType;
 use crate::rules::{Rule, RuleCategory, RuleMetadata, RuleMetadataRegistration, RuleRegistration};
 use crate::types::{Issue, Severity};
+use crate::utils::get_line_col;
 use std::path::Path;
 use std::sync::Arc;
 use swc_common::Spanned;
@@ -52,7 +53,7 @@ impl<'a> Visit for AnyTypeVisitor<'a> {
     fn visit_ts_keyword_type(&mut self, n: &TsKeywordType) {
         if matches!(n.kind, TsKeywordTypeKind::TsAnyKeyword) {
             let span = n.span();
-            let (line, column) = self.get_line_col(span.lo.0 as usize);
+            let (line, column) = get_line_col(self.source, span.lo.0 as usize);
 
             self.issues.push(Issue {
                 rule: "no-any-type".to_string(),
@@ -71,7 +72,7 @@ impl<'a> Visit for AnyTypeVisitor<'a> {
         if let TsType::TsKeywordType(ref kw) = &*n.type_ann {
             if matches!(kw.kind, TsKeywordTypeKind::TsAnyKeyword) {
                 let span = kw.span();
-                let (line, column) = self.get_line_col(span.lo.0 as usize);
+                let (line, column) = get_line_col(self.source, span.lo.0 as usize);
 
                 self.issues.push(Issue {
                     rule: "no-any-type".to_string(),
@@ -85,26 +86,5 @@ impl<'a> Visit for AnyTypeVisitor<'a> {
             }
         }
         n.visit_children_with(self);
-    }
-}
-
-impl<'a> AnyTypeVisitor<'a> {
-    fn get_line_col(&self, byte_pos: usize) -> (usize, usize) {
-        let mut line = 1;
-        let mut col = 1;
-
-        for (i, ch) in self.source.char_indices() {
-            if i >= byte_pos {
-                break;
-            }
-            if ch == '\n' {
-                line += 1;
-                col = 1;
-            } else {
-                col += 1;
-            }
-        }
-
-        (line, col)
     }
 }

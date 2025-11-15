@@ -28,7 +28,7 @@ type Change = {
 let gitApi: GitAPI | null = null;
 let changedFilesCache: Map<string, Set<string>> = new Map();
 let lastCacheUpdate: Map<string, number> = new Map();
-const CACHE_TTL = 2000;
+const CACHE_TTL = 30000;
 
 function getGitAPI(): GitAPI | null {
   if (!gitApi) {

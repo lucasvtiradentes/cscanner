@@ -16,6 +16,7 @@ pub struct RuleRegistration {
 inventory::collect!(RuleRegistration);
 
 mod consistent_return;
+mod max_function_length;
 mod metadata;
 mod no_absolute_imports;
 mod no_alias_imports;
@@ -27,9 +28,11 @@ mod no_empty_class;
 mod no_empty_function;
 mod no_implicit_any;
 mod no_magic_numbers;
+mod no_nested_ternary;
 mod no_relative_imports;
 mod no_todo_comments;
 mod no_unreachable_code;
+mod no_unused_vars;
 mod no_var;
 mod prefer_const;
 mod prefer_interface_over_type;

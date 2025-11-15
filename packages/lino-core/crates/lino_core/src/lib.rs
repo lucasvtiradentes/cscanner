@@ -1,10 +1,13 @@
+pub mod ast_utils;
 pub mod cache;
 pub mod config;
+pub mod disable_comments;
 pub mod parser;
 pub mod registry;
 pub mod rules;
 pub mod scanner;
 pub mod types;
+pub mod utils;
 pub mod watcher;
 
 pub use cache::FileCache;

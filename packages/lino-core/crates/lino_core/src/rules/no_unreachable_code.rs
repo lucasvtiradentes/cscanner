@@ -1,6 +1,7 @@
 use crate::config::RuleType;
 use crate::rules::{Rule, RuleCategory, RuleMetadata, RuleMetadataRegistration, RuleRegistration};
 use crate::types::{Issue, Severity};
+use crate::utils::get_line_col;
 use std::path::Path;
 use std::sync::Arc;
 use swc_common::Spanned;
@@ -62,7 +63,7 @@ impl<'a> UnreachableCodeVisitor<'a> {
         for stmt in stmts {
             if found_terminator {
                 let span = stmt.span();
-                let (line, column) = self.get_line_col(span.lo.0 as usize);
+                let (line, column) = get_line_col(self.source, span.lo.0 as usize);
 
                 self.issues.push(Issue {
                     rule: "no-unreachable-code".to_string(),
@@ -83,24 +84,6 @@ impl<'a> UnreachableCodeVisitor<'a> {
         }
     }
 
-    fn get_line_col(&self, byte_pos: usize) -> (usize, usize) {
-        let mut line = 1;
-        let mut col = 1;
-
-        for (i, ch) in self.source.char_indices() {
-            if i >= byte_pos {
-                break;
-            }
-            if ch == '\n' {
-                line += 1;
-                col = 1;
-            } else {
-                col += 1;
-            }
-        }
-
-        (line, col)
-    }
 }
 
 impl<'a> Visit for UnreachableCodeVisitor<'a> {

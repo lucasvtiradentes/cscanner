@@ -1,5 +1,6 @@
 use crate::cache::FileCache;
 use crate::config::LinoConfig;
+use crate::disable_comments::DisableDirectives;
 use crate::parser::parse_file;
 use crate::registry::RuleRegistry;
 use crate::types::{FileResult, ScanResult};
@@ -110,6 +111,12 @@ impl Scanner {
     }
 
     pub fn scan_content(&self, path: &Path, content: &str) -> Option<FileResult> {
+        let directives = DisableDirectives::from_source(content);
+
+        if directives.file_disabled {
+            return None;
+        }
+
         let program = match parse_file(path, content) {
             Ok(p) => p,
             Err(e) => {
@@ -133,6 +140,7 @@ impl Scanner {
                 }
                 rule_issues
             })
+            .filter(|issue| !directives.is_rule_disabled(issue.line, &issue.rule))
             .collect();
 
         if issues.is_empty() {
@@ -147,6 +155,13 @@ impl Scanner {
 
     fn analyze_file(&self, path: &Path) -> Option<FileResult> {
         let source = std::fs::read_to_string(path).ok()?;
+
+        let directives = DisableDirectives::from_source(&source);
+
+        if directives.file_disabled {
+            self.cache.insert(path.to_path_buf(), Vec::new());
+            return None;
+        }
 
         let program = match parse_file(path, &source) {
             Ok(p) => p,
@@ -171,6 +186,7 @@ impl Scanner {
                 }
                 rule_issues
             })
+            .filter(|issue| !directives.is_rule_disabled(issue.line, &issue.rule))
             .collect();
 
         self.cache.insert(path.to_path_buf(), issues.clone());

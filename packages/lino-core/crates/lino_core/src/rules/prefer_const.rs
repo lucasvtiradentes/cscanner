@@ -1,6 +1,7 @@
 use crate::config::RuleType;
 use crate::rules::{Rule, RuleCategory, RuleMetadata, RuleMetadataRegistration, RuleRegistration};
 use crate::types::{Issue, Severity};
+use crate::utils::get_line_col;
 use std::collections::{HashMap, HashSet};
 use std::path::Path;
 use std::sync::Arc;
@@ -70,24 +71,6 @@ struct VariableCollector<'a> {
 }
 
 impl<'a> VariableCollector<'a> {
-    fn get_line_col(&self, byte_pos: usize) -> (usize, usize) {
-        let mut line = 1;
-        let mut col = 1;
-
-        for (i, ch) in self.source.char_indices() {
-            if i >= byte_pos {
-                break;
-            }
-            if ch == '\n' {
-                line += 1;
-                col = 1;
-            } else {
-                col += 1;
-            }
-        }
-
-        (line, col)
-    }
 }
 
 impl<'a> Visit for VariableCollector<'a> {
@@ -97,7 +80,7 @@ impl<'a> Visit for VariableCollector<'a> {
                 if let Pat::Ident(ident) = &decl.name {
                     let name = ident.id.sym.to_string();
                     let span = ident.span();
-                    let (line, column) = self.get_line_col(span.lo.0 as usize);
+                    let (line, column) = get_line_col(self.source, span.lo.0 as usize);
                     self.let_declarations.insert(name, (line, column));
                 }
             }

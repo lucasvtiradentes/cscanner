@@ -1,6 +1,7 @@
 use crate::config::RuleType;
 use crate::rules::{Rule, RuleCategory, RuleMetadata, RuleMetadataRegistration, RuleRegistration};
 use crate::types::{Issue, Severity};
+use crate::utils::get_line_col;
 use std::path::Path;
 use std::sync::Arc;
 use swc_common::Spanned;
@@ -51,7 +52,7 @@ struct InterfaceVisitor<'a> {
 impl<'a> Visit for InterfaceVisitor<'a> {
     fn visit_ts_interface_decl(&mut self, n: &TsInterfaceDecl) {
         let span = n.span();
-        let (line, column) = self.get_line_col(span.lo.0 as usize);
+        let (line, column) = get_line_col(self.source, span.lo.0 as usize);
 
         self.issues.push(Issue {
             rule: "prefer-type-over-interface".to_string(),
@@ -68,22 +69,4 @@ impl<'a> Visit for InterfaceVisitor<'a> {
 }
 
 impl<'a> InterfaceVisitor<'a> {
-    fn get_line_col(&self, byte_pos: usize) -> (usize, usize) {
-        let mut line = 1;
-        let mut col = 1;
-
-        for (i, ch) in self.source.char_indices() {
-            if i >= byte_pos {
-                break;
-            }
-            if ch == '\n' {
-                line += 1;
-                col = 1;
-            } else {
-                col += 1;
-            }
-        }
-
-        (line, col)
-    }
 }

@@ -80,7 +80,47 @@ impl LinoConfig {
     pub fn load_from_file(path: &Path) -> Result<Self, Box<dyn std::error::Error>> {
         let content = std::fs::read_to_string(path)?;
         let config: Self = serde_json::from_str(&content)?;
+        config.validate()?;
         Ok(config)
+    }
+
+    pub fn validate(&self) -> Result<(), Box<dyn std::error::Error>> {
+        let mut errors = Vec::new();
+
+        for (name, rule_config) in &self.rules {
+            if rule_config.rule_type == RuleType::Regex {
+                if let Some(pattern) = &rule_config.pattern {
+                    if let Err(e) = regex::Regex::new(pattern) {
+                        errors.push(format!("Rule '{}' has invalid regex pattern: {}", name, e));
+                    }
+                } else {
+                    errors.push(format!("Rule '{}' is type 'regex' but has no 'pattern' field", name));
+                }
+            }
+        }
+
+        let conflicting_rules = [
+            ("prefer-type-over-interface", "prefer-interface-over-type"),
+            ("no-relative-imports", "no-absolute-imports"),
+        ];
+
+        for (rule1, rule2) in &conflicting_rules {
+            let rule1_enabled = self.rules.get(*rule1).map_or(false, |r| r.enabled);
+            let rule2_enabled = self.rules.get(*rule2).map_or(false, |r| r.enabled);
+
+            if rule1_enabled && rule2_enabled {
+                errors.push(format!(
+                    "Conflicting rules enabled: '{}' and '{}'. These rules contradict each other.",
+                    rule1, rule2
+                ));
+            }
+        }
+
+        if !errors.is_empty() {
+            return Err(format!("Config validation failed:\n  - {}", errors.join("\n  - ")).into());
+        }
+
+        Ok(())
     }
 
     pub fn load_from_workspace(workspace: &Path) -> Result<Self, Box<dyn std::error::Error>> {
