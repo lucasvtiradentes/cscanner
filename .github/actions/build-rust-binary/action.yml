@@ -39,20 +39,42 @@ runs:
       working-directory: packages/core
       run: cargo build --release --target ${{ inputs.target }}
 
-    - name: Prepare binary
+    - name: Prepare binaries
       shell: bash
       run: |
         cd packages/core/target/${{ inputs.target }}/release
         if [[ "${{ inputs.os }}" == "windows-latest" ]]; then
           cp cscanner-server.exe cscanner-server-${{ inputs.target }}.exe
-          echo "BINARY_NAME=cscanner-server-${{ inputs.target }}.exe" >> $GITHUB_ENV
+          cp cscanner.exe cscanner-${{ inputs.target }}.exe
         else
           cp cscanner-server cscanner-server-${{ inputs.target }}
-          echo "BINARY_NAME=cscanner-server-${{ inputs.target }}" >> $GITHUB_ENV
+          cp cscanner cscanner-${{ inputs.target }}
         fi
 
-    - name: Upload binary artifact
+    - name: Upload server binary (Unix)
+      if: inputs.os != 'windows-latest'
       uses: actions/upload-artifact@v4
       with:
-        name: binary-${{ inputs.target }}
-        path: packages/core/target/${{ inputs.target }}/release/${{ env.BINARY_NAME }}
+        name: binary-server-${{ inputs.target }}
+        path: packages/core/target/${{ inputs.target }}/release/cscanner-server-${{ inputs.target }}
+
+    - name: Upload server binary (Windows)
+      if: inputs.os == 'windows-latest'
+      uses: actions/upload-artifact@v4
+      with:
+        name: binary-server-${{ inputs.target }}
+        path: packages/core/target/${{ inputs.target }}/release/cscanner-server-${{ inputs.target }}.exe
+
+    - name: Upload CLI binary (Unix)
+      if: inputs.os != 'windows-latest'
+      uses: actions/upload-artifact@v4
+      with:
+        name: binary-cli-${{ inputs.target }}
+        path: packages/core/target/${{ inputs.target }}/release/cscanner-${{ inputs.target }}
+
+    - name: Upload CLI binary (Windows)
+      if: inputs.os == 'windows-latest'
+      uses: actions/upload-artifact@v4
+      with:
+        name: binary-cli-${{ inputs.target }}
+        path: packages/core/target/${{ inputs.target }}/release/cscanner-${{ inputs.target }}.exe

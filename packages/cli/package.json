@@ -24,7 +24,7 @@
     "cscanner-win32-x64": "workspace:*"
   },
   "scripts": {
-    "postinstall": "tsx ./scripts/safe-postinstall.ts",
+    "postinstall": "node ./dist/scripts/safe-postinstall.js",
     "build": "tsc && ./scripts/copy-binaries.sh",
     "start": "node ./dist/src/cscanner.js",
     "typecheck": "tsc --noEmit",

@@ -94,7 +94,6 @@ jobs:
         run: |
           echo "📦 Organizing binaries for CLI packages..."
 
-          # Map Rust targets to npm platform names
           declare -A PLATFORM_MAP=(
             ["x86_64-unknown-linux-gnu"]="linux-x64"
             ["aarch64-unknown-linux-gnu"]="linux-arm64"
@@ -103,11 +102,13 @@ jobs:
             ["x86_64-pc-windows-msvc"]="win32-x64"
           )
 
+          found_count=0
+          missing_count=0
+
           for rust_target in "${!PLATFORM_MAP[@]}"; do
             npm_platform="${PLATFORM_MAP[$rust_target]}"
             dest_dir="packages/cli/npm/$npm_platform"
 
-            # Find cscanner binary (not cscanner-server)
             if [[ "$rust_target" == *"windows"* ]]; then
               binary_pattern="cscanner-${rust_target}.exe"
               dest_name="cscanner.exe"
@@ -123,14 +124,19 @@ jobs:
               cp "$binary_file" "$dest_dir/$dest_name"
               chmod +x "$dest_dir/$dest_name" 2>/dev/null || true
               echo "✅ Copied $npm_platform binary"
+              ((found_count++))
             else
-              echo "⚠️  Binary not found: $binary_pattern"
+              ((missing_count++))
             fi
           done
 
           echo ""
-          echo "📦 CLI binaries ready:"
-          find packages/cli/npm -type f \( -name "cscanner" -o -name "cscanner.exe" \) -exec ls -lh {} \;
+          echo "📦 Summary: $found_count binaries copied, $missing_count not found (expected during non-release builds)"
+
+          if [ $found_count -gt 0 ]; then
+            echo "📦 CLI binaries ready:"
+            find packages/cli/npm -type f \( -name "cscanner" -o -name "cscanner.exe" \) -exec ls -lh {} \;
+          fi
 
       - name: Rebuild extension with binaries
         if: needs.push_to_main_ci.outputs.should_release == 'true'
