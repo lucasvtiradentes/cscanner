@@ -1,61 +1,165 @@
-import * as fs from 'fs';
-import * as path from 'path';
-import * as os from 'os';
+import {
+  copyFileSync,
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  readdirSync,
+  rmSync,
+  statSync,
+  writeFileSync,
+} from 'node:fs';
+import { homedir } from 'node:os';
+import { join } from 'node:path';
 
 if (process.env.CI || process.env.GITHUB_ACTIONS) {
   console.log('Skipping local installation in CI environment');
   process.exit(0);
 }
 
-interface PackageJson {
-  publisher: string;
-  name: string;
-  version: string;
-}
+const DEV_SUFFIX = 'Dev';
 
-const packageJson: PackageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
-const extensionName = `${packageJson.publisher}.${packageJson.name}-${packageJson.version}`;
-const homeDir = os.homedir();
-const targetDir = path.join(homeDir, '.vscode', 'extensions', extensionName);
+const packageJson = JSON.parse(readFileSync('package.json', 'utf8'));
+const extensionName = `${packageJson.publisher}.${packageJson.name}-dev`;
+const homeDir = homedir();
+const targetDir = join(homeDir, '.vscode', 'extensions', extensionName);
 
 console.log('Installing extension locally...');
 
-if (fs.existsSync(targetDir)) {
-  fs.rmSync(targetDir, { recursive: true });
+if (existsSync(targetDir)) {
+  rmSync(targetDir, { recursive: true });
 }
 
-fs.mkdirSync(targetDir, { recursive: true });
+mkdirSync(targetDir, { recursive: true });
 
 function copyRecursive(src: string, dest: string): void {
-  const stat = fs.statSync(src);
+  const stat = statSync(src);
 
   if (stat.isDirectory()) {
-    if (!fs.existsSync(dest)) {
-      fs.mkdirSync(dest, { recursive: true });
+    if (!existsSync(dest)) {
+      mkdirSync(dest, { recursive: true });
     }
 
-    const entries = fs.readdirSync(src);
+    const entries = readdirSync(src);
     for (const entry of entries) {
-      copyRecursive(path.join(src, entry), path.join(dest, entry));
+      copyRecursive(join(src, entry), join(dest, entry));
     }
   } else {
-    fs.copyFileSync(src, dest);
+    copyFileSync(src, dest);
   }
 }
 
-copyRecursive('out', path.join(targetDir, 'out'));
-copyRecursive('resources', path.join(targetDir, 'resources'));
-fs.copyFileSync('package.json', path.join(targetDir, 'package.json'));
-
-if (fs.existsSync('LICENSE')) {
-  fs.copyFileSync('LICENSE', path.join(targetDir, 'LICENSE'));
+function addDevSuffix(str: string): string {
+  return `${str}${DEV_SUFFIX}`;
 }
 
-if (fs.existsSync('README.md')) {
-  fs.copyFileSync('README.md', path.join(targetDir, 'README.md'));
+function addDevLabel(str: string): string {
+  return `${str} (Dev)`;
 }
 
-console.log(`✅ Extension installed to: ${targetDir}`);
+function applyDevTransformations(pkg: Record<string, unknown>): Record<string, unknown> {
+  const transformed = { ...pkg };
+
+  transformed.name = `${pkg.name}-dev`;
+  transformed.displayName = addDevLabel(pkg.displayName as string);
+
+  const contributes = transformed.contributes as Record<string, unknown>;
+  if (!contributes) return transformed;
+
+  if (contributes.viewsContainers) {
+    const containers = contributes.viewsContainers as Record<string, unknown>;
+    if (containers.activitybar) {
+      containers.activitybar = (containers.activitybar as Array<{ id: string; title: string }>).map((container) => ({
+        ...container,
+        id: addDevSuffix(container.id),
+        title: addDevLabel(container.title),
+      }));
+    }
+  }
+
+  if (contributes.views) {
+    const views = contributes.views as Record<string, Array<{ id: string; name?: string }>>;
+    const newViews: Record<string, unknown> = {};
+
+    for (const [containerKey, viewList] of Object.entries(views)) {
+      const newContainerKey = addDevSuffix(containerKey);
+      newViews[newContainerKey] = viewList.map((view) => ({
+        ...view,
+        id: addDevSuffix(view.id),
+        name: view.name ? addDevLabel(view.name) : undefined,
+      }));
+    }
+
+    contributes.views = newViews;
+  }
+
+  if (contributes.menus) {
+    const menus = contributes.menus as Record<string, Array<{ when?: string; command?: string }>>;
+
+    for (const menuList of Object.values(menus)) {
+      for (const menu of menuList) {
+        if (menu.when) {
+          menu.when = menu.when.replace(/(\w+)(?=\s|$|==)/g, (match) => {
+            if (match.startsWith('lino') && !match.endsWith(DEV_SUFFIX)) {
+              return addDevSuffix(match);
+            }
+            return match;
+          });
+        }
+        if (menu.command && menu.command.startsWith('lino.')) {
+          menu.command = menu.command.replace('lino.', `${addDevSuffix('lino')}.`);
+        }
+      }
+    }
+  }
+
+  if (contributes.commands) {
+    const commands = contributes.commands as Array<{ command: string; title?: string }>;
+    for (const cmd of commands) {
+      if (cmd.command.startsWith('lino.')) {
+        cmd.command = cmd.command.replace('lino.', `${addDevSuffix('lino')}.`);
+      }
+      if (cmd.title && cmd.title.startsWith('Lino:')) {
+        cmd.title = cmd.title.replace('Lino:', 'Lino (Dev):');
+      }
+    }
+  }
+
+  if (contributes.keybindings) {
+    const keybindings = contributes.keybindings as Array<{ when?: string; command?: string }>;
+    for (const binding of keybindings) {
+      if (binding.when) {
+        binding.when = binding.when.replace(/(\w+)(?=\s|$|==)/g, (match) => {
+          if (match.startsWith('lino') && !match.endsWith(DEV_SUFFIX)) {
+            return addDevSuffix(match);
+          }
+          return match;
+        });
+      }
+      if (binding.command && binding.command.startsWith('lino.')) {
+        binding.command = binding.command.replace('lino.', `${addDevSuffix('lino')}.`);
+      }
+    }
+  }
+
+  return transformed;
+}
+
+copyRecursive('out', join(targetDir, 'out'));
+copyRecursive('resources', join(targetDir, 'resources'));
+
+const modifiedPackageJson = applyDevTransformations(packageJson);
+writeFileSync(join(targetDir, 'package.json'), JSON.stringify(modifiedPackageJson, null, 2));
+
+if (existsSync('LICENSE')) {
+  copyFileSync('LICENSE', join(targetDir, 'LICENSE'));
+}
+
+if (existsSync('README.md')) {
+  copyFileSync('README.md', join(targetDir, 'README.md'));
+}
+
+console.log(`\n✅ Extension installed to: ${targetDir}`);
+console.log(`   Extension name: ${extensionName}`);
 console.log(`\n🔄 Reload VSCode to activate the extension:`);
 console.log(`   - Press Ctrl+Shift+P`);
 console.log(`   - Type "Reload Window" and press Enter\n`);

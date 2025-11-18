@@ -1,6 +1,7 @@
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import * as vscode from 'vscode';
+import { EXTENSION_ID } from '../constants';
 import { IssueResult } from '../types';
 import { LOG_FILE_PATH, logger } from '../utils/logger';
 import { RustClient } from './rust-client';
@@ -8,7 +9,7 @@ import { RustClient } from './rust-client';
 let rustClient: RustClient | null = null;
 
 export function getRustBinaryPath(): string | null {
-  const extensionPath = vscode.extensions.getExtension('lucasvtiradentes.lino-vscode')?.extensionPath;
+  const extensionPath = vscode.extensions.getExtension(EXTENSION_ID)?.extensionPath;
   if (!extensionPath) {
     logger.error('Extension path not found');
     return null;
