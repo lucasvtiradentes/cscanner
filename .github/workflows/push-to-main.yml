@@ -27,6 +27,31 @@ jobs:
       TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
       TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
 
+  build_rust_binaries:
+    name: 'Build Rust Binaries'
+    needs: [push_to_main_ci]
+    if: needs.push_to_main_ci.outputs.should_release == 'true'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+          - os: ubuntu-latest
+            target: aarch64-unknown-linux-gnu
+          - os: macos-latest
+            target: x86_64-apple-darwin
+          - os: macos-latest
+            target: aarch64-apple-darwin
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/build-rust-binary
+        with:
+          target: ${{ matrix.target }}
+          os: ${{ matrix.os }}
+
   release:
     name: 'Release'
     needs: [push_to_main_ci]
@@ -42,6 +67,21 @@ jobs:
           fetch-depth: 2
 
       - uses: ./.github/actions/setup-and-install
+
+      - name: Download all binaries
+        if: needs.push_to_main_ci.outputs.should_release == 'true'
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Organize binaries for extension
+        if: needs.push_to_main_ci.outputs.should_release == 'true'
+        run: |
+          mkdir -p packages/vscode-extension/binaries
+          find artifacts -type f -name 'cscan-server-*' -exec cp {} packages/vscode-extension/binaries/ \;
+          chmod +x packages/vscode-extension/binaries/cscan-server-* 2>/dev/null || true
+          echo "📦 Binaries ready for extension:"
+          ls -lah packages/vscode-extension/binaries/
 
       - name: Create Release Pull Request or Publish
         id: changesets

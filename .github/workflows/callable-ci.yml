@@ -11,6 +11,10 @@ on:
         description: 'Run build'
         type: boolean
         required: true
+    outputs:
+      should_release:
+        description: 'Whether version was bumped and should trigger release'
+        value: ${{ jobs.check_version.outputs.should_build }}
     secrets:
       TURBO_TOKEN:
         description: Turbo token for cache
@@ -25,6 +29,30 @@ env:
   TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
 
 jobs:
+  check_version:
+    runs-on: ubuntu-latest
+    outputs:
+      should_build: ${{ steps.check.outputs.should_build }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Check if version was bumped
+        id: check
+        run: |
+          VSCODE_PKG="packages/vscode-extension/package.json"
+          CURRENT_VERSION=$(node -p "require('./$VSCODE_PKG').version")
+          PREVIOUS_VERSION=$(git show HEAD^:./$VSCODE_PKG 2>/dev/null | node -p "try { JSON.parse(require('fs').readFileSync('/dev/stdin', 'utf-8')).version } catch(e) { '' }" || echo "")
+
+          if [ -n "$PREVIOUS_VERSION" ] && [ "$PREVIOUS_VERSION" != "$CURRENT_VERSION" ]; then
+            echo "Version bumped: $PREVIOUS_VERSION → $CURRENT_VERSION"
+            echo "should_build=true" >> $GITHUB_OUTPUT
+          else
+            echo "Version not changed"
+            echo "should_build=false" >> $GITHUB_OUTPUT
+          fi
+
   lint:
     if: inputs.run_lint
     runs-on: ubuntu-latest

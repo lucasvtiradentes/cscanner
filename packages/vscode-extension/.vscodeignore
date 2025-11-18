@@ -1,15 +1,23 @@
+# FOLDERS ======================================================================
+
 .vscode/**
 .vscode-test/**
+.turbo/**
+node_modules/**
 src/**
+scripts/**
+
+# FILES ========================================================================
+
 tsconfig.json
 esbuild.config.ts
-node_modules/**
 .gitignore
-*.vsix
-scripts/**
-**/*.map
 .DS_Store
-.turbo/**
+*.vsix
+**/*.map
+
+# OUT FOLDER (exclude all except extension.js and binaries) ====================
+
 out/**/*.ts
 out/**/*.js
 !out/extension.js
