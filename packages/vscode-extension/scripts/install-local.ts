@@ -110,13 +110,21 @@ function applyDevTransformations(pkg: Record<string, unknown>): Record<string, u
   }
 
   if (contributes.commands) {
-    const commands = contributes.commands as Array<{ command: string; title?: string }>;
+    const commands = contributes.commands as Array<{ command: string; title?: string; enablement?: string }>;
     for (const cmd of commands) {
       if (cmd.command.startsWith(`${CONTEXT_PREFIX}.`)) {
         cmd.command = cmd.command.replace(`${CONTEXT_PREFIX}.`, `${addDevSuffix(CONTEXT_PREFIX)}.`);
       }
       if (cmd.title && cmd.title.startsWith('Lino:')) {
         cmd.title = cmd.title.replace('Lino:', 'Lino (Dev):');
+      }
+      if (cmd.enablement) {
+        cmd.enablement = cmd.enablement.replace(/(\w+)(?=\s|$|==)/g, (match) => {
+          if (match.startsWith(CONTEXT_PREFIX) && !match.endsWith(DEV_SUFFIX)) {
+            return addDevSuffix(match);
+          }
+          return match;
+        });
       }
     }
   }
@@ -143,6 +151,11 @@ function applyDevTransformations(pkg: Record<string, unknown>): Record<string, u
 
 copyRecursive('out', join(targetDir, 'out'));
 copyRecursive('resources', join(targetDir, 'resources'));
+
+const extensionJs = readFileSync(join(targetDir, 'out', 'extension.js'), 'utf8');
+const devSuffixPattern = /Qe="Dev",([A-Za-z]+)=!1/;
+const patchedExtensionJs = extensionJs.replace(devSuffixPattern, 'Qe="Dev",$1=!0');
+writeFileSync(join(targetDir, 'out', 'extension.js'), patchedExtensionJs);
 
 const modifiedPackageJson = applyDevTransformations(packageJson);
 writeFileSync(join(targetDir, 'package.json'), JSON.stringify(modifiedPackageJson, null, 2));

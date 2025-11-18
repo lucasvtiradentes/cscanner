@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { registerAllCommands } from './commands';
+import { getContextKey } from './common/constants';
 import { loadEffectiveConfig } from './common/lib/config-manager';
 import { dispose as disposeScanner, scanContent } from './common/lib/scanner';
 import { getViewId } from './common/utils/extension-helper';
@@ -39,9 +40,9 @@ export function activate(context: vscode.ExtensionContext) {
   }));
   searchProvider.setResults(deserializedResults);
 
-  vscode.commands.executeCommand('setContext', 'linoViewMode', viewModeKey);
-  vscode.commands.executeCommand('setContext', 'linoGroupMode', groupModeKey);
-  vscode.commands.executeCommand('setContext', 'linoScanMode', scanModeKey);
+  vscode.commands.executeCommand('setContext', getContextKey('linoViewMode'), viewModeKey);
+  vscode.commands.executeCommand('setContext', getContextKey('linoGroupMode'), groupModeKey);
+  vscode.commands.executeCommand('setContext', getContextKey('linoScanMode'), scanModeKey);
 
   const viewId = getViewId();
   logger.info(`Registering tree view with ID: ${viewId}`);

@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { getCommandId, getContextKey } from '../common/constants';
 import { hasLocalConfig, loadEffectiveConfig } from '../common/lib/config-manager';
 import { scanWorkspace } from '../common/lib/scanner';
 import { branchExists, getChangedFiles, getModifiedLineRanges } from '../common/utils/git-helper';
@@ -17,7 +18,7 @@ export function createFindIssueCommand(
   currentScanModeRef: { current: 'workspace' | 'branch' },
   currentCompareBranchRef: { current: string },
 ) {
-  return vscode.commands.registerCommand('lino.findIssue', async (options?: { silent?: boolean }) => {
+  return vscode.commands.registerCommand(getCommandId('findIssue'), async (options?: { silent?: boolean }) => {
     if (isSearchingRef.current) {
       if (!options?.silent) {
         vscode.window.showWarningMessage('Search already in progress');
@@ -43,7 +44,7 @@ export function createFindIssueCommand(
           'Configure Rules',
         );
         if (action === 'Configure Rules') {
-          await vscode.commands.executeCommand('lino.manageRules');
+          await vscode.commands.executeCommand(getCommandId('manageRules'));
         }
       }
       return;
@@ -66,20 +67,20 @@ export function createFindIssueCommand(
         );
 
         if (action === 'Change Branch') {
-          await vscode.commands.executeCommand('lino.openSettingsMenu');
+          await vscode.commands.executeCommand(getCommandId('openSettingsMenu'));
         } else if (action === 'Switch to Workspace Mode') {
           currentScanModeRef.current = 'workspace';
           context.workspaceState.update('lino.scanMode', 'workspace');
-          vscode.commands.executeCommand('setContext', 'linoScanMode', 'workspace');
+          vscode.commands.executeCommand('setContext', getContextKey('linoScanMode'), 'workspace');
           await updateStatusBar();
-          await vscode.commands.executeCommand('lino.findIssue', { silent: true });
+          await vscode.commands.executeCommand(getCommandId('findIssue'), { silent: true });
         }
         return;
       }
     }
 
     isSearchingRef.current = true;
-    vscode.commands.executeCommand('setContext', 'linoSearching', true);
+    vscode.commands.executeCommand('setContext', getContextKey('linoSearching'), true);
     treeView.badge = { value: 0, tooltip: 'Searching...' };
 
     const scanTitle =
@@ -196,7 +197,7 @@ export function createFindIssueCommand(
       );
     } finally {
       isSearchingRef.current = false;
-      vscode.commands.executeCommand('setContext', 'linoSearching', false);
+      vscode.commands.executeCommand('setContext', getContextKey('linoSearching'), false);
     }
   });
 }

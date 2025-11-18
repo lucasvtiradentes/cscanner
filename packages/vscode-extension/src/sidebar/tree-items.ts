@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { getCommandId } from '../common/constants';
 import { FolderNode, IssueResult, ViewMode } from '../common/types';
 import { getFolderIssueCount } from './tree-builder';
 
@@ -52,7 +53,7 @@ export class LineResultItem extends vscode.TreeItem {
     this.tooltip = result.text;
 
     this.command = {
-      command: 'lino.openFile',
+      command: getCommandId('openFile'),
       title: 'Open File',
       arguments: [result.uri, result.line, result.column],
     };

@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { getCommandId, getContextKey } from '../common/constants';
 import { getGlobalConfigPath, getLocalConfigPath } from '../common/lib/config-manager';
 import { getAllBranches, getCurrentBranch, invalidateCache } from '../common/utils/git-helper';
 import { logger } from '../common/utils/logger';
@@ -11,7 +12,7 @@ export function createOpenSettingsMenuCommand(
   context: vscode.ExtensionContext,
   searchProvider: SearchResultProvider,
 ) {
-  return vscode.commands.registerCommand('lino.openSettingsMenu', async () => {
+  return vscode.commands.registerCommand(getCommandId('openSettingsMenu'), async () => {
     logger.info('openSettingsMenu command called');
     const mainMenuItems: vscode.QuickPickItem[] = [
       {
@@ -36,7 +37,7 @@ export function createOpenSettingsMenuCommand(
     if (!selected) return;
 
     if (selected.label.includes('Manage Rules')) {
-      await vscode.commands.executeCommand('lino.manageRules');
+      await vscode.commands.executeCommand(getCommandId('manageRules'));
       return;
     }
 
@@ -114,10 +115,10 @@ async function showScanSettingsMenu(
     searchProvider.setResults([]);
     currentScanModeRef.current = 'workspace';
     context.workspaceState.update('lino.scanMode', 'workspace');
-    vscode.commands.executeCommand('setContext', 'linoScanMode', 'workspace');
+    vscode.commands.executeCommand('setContext', getContextKey('linoScanMode'), 'workspace');
     invalidateCache();
     updateStatusBar();
-    vscode.commands.executeCommand('lino.findIssue');
+    vscode.commands.executeCommand(getCommandId('findIssue'));
   } else if (selected.label.includes('Branch')) {
     const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
     if (!workspaceFolder) {
@@ -203,9 +204,9 @@ async function showScanSettingsMenu(
     searchProvider.setResults([]);
     currentScanModeRef.current = 'branch';
     context.workspaceState.update('lino.scanMode', 'branch');
-    vscode.commands.executeCommand('setContext', 'linoScanMode', 'branch');
+    vscode.commands.executeCommand('setContext', getContextKey('linoScanMode'), 'branch');
     invalidateCache();
     updateStatusBar();
-    vscode.commands.executeCommand('lino.findIssue');
+    vscode.commands.executeCommand(getCommandId('findIssue'));
   }
 }

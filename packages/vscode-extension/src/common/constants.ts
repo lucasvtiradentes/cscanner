@@ -10,6 +10,21 @@ export const VIEW_ID = 'linoExplorer';
 
 export const DEV_SUFFIX = 'Dev';
 
+declare const __IS_DEV_BUILD__: boolean;
+const IS_DEV = typeof __IS_DEV_BUILD__ !== 'undefined' && __IS_DEV_BUILD__;
+
+export function getCommandId(command: string): string {
+  return IS_DEV ? `${CONTEXT_PREFIX}${DEV_SUFFIX}.${command}` : `${CONTEXT_PREFIX}.${command}`;
+}
+
+export function getContextKey(key: string): string {
+  return IS_DEV ? `${key}${DEV_SUFFIX}` : key;
+}
+
+export function getViewId(): string {
+  return IS_DEV ? `${VIEW_ID}${DEV_SUFFIX}` : VIEW_ID;
+}
+
 export const BINARY_BASE_NAME = 'lino-server';
 
 export function getBinaryName(): string {

@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { getCommandId } from '../common/constants';
 import {
   LinoConfig,
   getDefaultConfig,
@@ -32,7 +33,7 @@ function getCategoryIcon(category: string): string {
 }
 
 export function createManageRulesCommand(updateStatusBar: () => Promise<void>, context: vscode.ExtensionContext) {
-  return vscode.commands.registerCommand('lino.manageRules', async () => {
+  return vscode.commands.registerCommand(getCommandId('manageRules'), async () => {
     const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
     if (!workspaceFolder) {
       vscode.window.showErrorMessage('No workspace folder open');
@@ -222,7 +223,7 @@ export function createManageRulesCommand(updateStatusBar: () => Promise<void>, c
 
       await updateStatusBar();
 
-      await vscode.commands.executeCommand('lino.findIssue');
+      await vscode.commands.executeCommand(getCommandId('findIssue'));
     } catch (error) {
       logger.error(`Failed to manage rules: ${error}`);
       await client.stop();

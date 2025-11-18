@@ -14,6 +14,9 @@ const extensionBuildOptions: BuildOptions = {
   sourcemap: isWatch,
   minify: !isWatch,
   logLevel: 'info',
+  define: {
+    __IS_DEV_BUILD__: 'false',
+  },
 };
 
 async function build() {
