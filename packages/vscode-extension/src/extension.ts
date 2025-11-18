@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import { registerAllCommands } from './commands';
 import { loadEffectiveConfig } from './common/lib/config-manager';
 import { dispose as disposeScanner, scanContent } from './common/lib/scanner';
+import { getViewId } from './common/utils/extension-helper';
 import { getChangedFiles, getModifiedLineRanges, invalidateCache } from './common/utils/git-helper';
 import { getNewIssues } from './common/utils/issue-comparator';
 import { logger } from './common/utils/logger';
@@ -42,7 +43,10 @@ export function activate(context: vscode.ExtensionContext) {
   vscode.commands.executeCommand('setContext', 'linoGroupMode', groupModeKey);
   vscode.commands.executeCommand('setContext', 'linoScanMode', scanModeKey);
 
-  const treeView = vscode.window.createTreeView('linoExplorer', {
+  const viewId = getViewId();
+  logger.info(`Registering tree view with ID: ${viewId}`);
+
+  const treeView = vscode.window.createTreeView(viewId, {
     treeDataProvider: searchProvider,
   });
 

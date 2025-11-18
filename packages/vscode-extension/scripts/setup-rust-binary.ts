@@ -1,20 +1,13 @@
 import * as fs from 'node:fs';
 import * as https from 'node:https';
 import * as path from 'node:path';
+import { BINARY_BASE_NAME, PLATFORM_TARGET_MAP, getBinaryName } from '../src/common/constants';
 
 const BINARY_DIR = path.join(__dirname, '..', 'binaries');
 
-const PLATFORM_MAP: Record<string, string> = {
-  'linux-x64': 'x86_64-unknown-linux-gnu',
-  'linux-arm64': 'aarch64-unknown-linux-gnu',
-  'darwin-x64': 'x86_64-apple-darwin',
-  'darwin-arm64': 'aarch64-apple-darwin',
-  'win32-x64': 'x86_64-pc-windows-msvc',
-};
-
 function getPlatformTarget(): string | null {
   const platform = `${process.platform}-${process.arch}`;
-  const target = PLATFORM_MAP[platform];
+  const target = PLATFORM_TARGET_MAP[platform];
 
   if (!target) {
     console.warn(`Unsupported platform: ${platform}. Lino Rust core will not be available.`);
@@ -31,16 +24,14 @@ function ensureBinaryDir(): void {
 }
 
 function getBinaryPath(target: string): string {
-  const binaryName = process.platform === 'win32' ? 'lino-server.exe' : 'lino-server';
-  return path.join(BINARY_DIR, `${binaryName}-${target}`);
+  return path.join(BINARY_DIR, `${getBinaryName()}-${target}`);
 }
 
 function downloadBinary(target: string): Promise<boolean> {
   return new Promise((resolve, reject) => {
     const packageJson = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json'), 'utf8'));
     const version = packageJson.version;
-    const binaryName = process.platform === 'win32' ? 'lino-server.exe' : 'lino-server';
-    const url = `https://github.com/lucasvtiradentes/lino/releases/download/v${version}/lino-server-${target}${process.platform === 'win32' ? '.exe' : ''}`;
+    const url = `https://github.com/lucasvtiradentes/lino/releases/download/v${version}/${BINARY_BASE_NAME}-${target}${process.platform === 'win32' ? '.exe' : ''}`;
 
     console.log(`Attempting to download Rust binary from: ${url}`);
 
@@ -79,7 +70,7 @@ function downloadBinary(target: string): Promise<boolean> {
 }
 
 function checkLocalBinary(): boolean {
-  const localBinaryPath = path.join(__dirname, '..', '..', 'lino-core', 'target', 'debug', 'lino-server');
+  const localBinaryPath = path.join(__dirname, '..', '..', 'lino-core', 'target', 'debug', getBinaryName());
 
   if (fs.existsSync(localBinaryPath)) {
     console.log('Found local development Rust binary. Using local build.');

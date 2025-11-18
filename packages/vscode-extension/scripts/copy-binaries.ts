@@ -1,5 +1,6 @@
 import { copyFileSync, existsSync, mkdirSync, readdirSync } from 'node:fs';
 import { join, resolve } from 'node:path';
+import { BINARY_BASE_NAME, PLATFORM_TARGET_MAP, getBinaryName } from '../src/common/constants';
 
 const extensionRoot = resolve(__dirname, '..');
 const outBinariesDir = join(extensionRoot, 'out', 'binaries');
@@ -7,7 +8,7 @@ const rustCoreDir = join(extensionRoot, '..', 'lino-core');
 
 console.log('Copying Rust binaries to out/binaries...');
 
-const binaryName = process.platform === 'win32' ? 'lino-server.exe' : 'lino-server';
+const binaryName = getBinaryName();
 const releaseBinary = join(rustCoreDir, 'target', 'release', binaryName);
 const debugBinary = join(rustCoreDir, 'target', 'debug', binaryName);
 
@@ -23,16 +24,8 @@ if (!sourceBinary) {
 
   const platform = process.platform;
   const arch = process.arch;
-  const targetMap: Record<string, string> = {
-    'linux-x64': 'x86_64-unknown-linux-gnu',
-    'linux-arm64': 'aarch64-unknown-linux-gnu',
-    'darwin-x64': 'x86_64-apple-darwin',
-    'darwin-arm64': 'aarch64-apple-darwin',
-    'win32-x64': 'x86_64-pc-windows-msvc',
-  };
-
-  const target = targetMap[`${platform}-${arch}`];
-  const destBinaryName = target ? `lino-server-${target}${platform === 'win32' ? '.exe' : ''}` : binaryName;
+  const target = PLATFORM_TARGET_MAP[`${platform}-${arch}`];
+  const destBinaryName = target ? `${BINARY_BASE_NAME}-${target}${platform === 'win32' ? '.exe' : ''}` : binaryName;
   const destBinary = join(outBinariesDir, destBinaryName);
 
   copyFileSync(sourceBinary, destBinary);
@@ -40,7 +33,7 @@ if (!sourceBinary) {
 }
 
 const existingBinaries = existsSync(outBinariesDir)
-  ? readdirSync(outBinariesDir).filter((f) => f.startsWith('lino-server'))
+  ? readdirSync(outBinariesDir).filter((f) => f.startsWith(BINARY_BASE_NAME))
   : [];
 if (existingBinaries.length > 0) {
   console.log(`\n📦 Binaries in out/binaries/ (${existingBinaries.length}):`);

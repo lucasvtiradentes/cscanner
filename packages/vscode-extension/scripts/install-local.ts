@@ -10,18 +10,15 @@ import {
 } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
+import { CONTEXT_PREFIX, DEV_SUFFIX, EXTENSION_ID_DEV } from '../src/common/constants';
 
 if (process.env.CI || process.env.GITHUB_ACTIONS) {
   console.log('Skipping local installation in CI environment');
   process.exit(0);
 }
 
-const DEV_SUFFIX = 'Dev';
-
 const packageJson = JSON.parse(readFileSync('package.json', 'utf8'));
-const extensionName = `${packageJson.publisher}.${packageJson.name}-dev`;
-const homeDir = homedir();
-const targetDir = join(homeDir, '.vscode', 'extensions', extensionName);
+const targetDir = join(homedir(), '.vscode', 'extensions', EXTENSION_ID_DEV);
 
 console.log('Installing extension locally...');
 
@@ -99,14 +96,14 @@ function applyDevTransformations(pkg: Record<string, unknown>): Record<string, u
       for (const menu of menuList) {
         if (menu.when) {
           menu.when = menu.when.replace(/(\w+)(?=\s|$|==)/g, (match) => {
-            if (match.startsWith('lino') && !match.endsWith(DEV_SUFFIX)) {
+            if (match.startsWith(CONTEXT_PREFIX) && !match.endsWith(DEV_SUFFIX)) {
               return addDevSuffix(match);
             }
             return match;
           });
         }
-        if (menu.command && menu.command.startsWith('lino.')) {
-          menu.command = menu.command.replace('lino.', `${addDevSuffix('lino')}.`);
+        if (menu.command && menu.command.startsWith(`${CONTEXT_PREFIX}.`)) {
+          menu.command = menu.command.replace(`${CONTEXT_PREFIX}.`, `${addDevSuffix(CONTEXT_PREFIX)}.`);
         }
       }
     }
@@ -115,8 +112,8 @@ function applyDevTransformations(pkg: Record<string, unknown>): Record<string, u
   if (contributes.commands) {
     const commands = contributes.commands as Array<{ command: string; title?: string }>;
     for (const cmd of commands) {
-      if (cmd.command.startsWith('lino.')) {
-        cmd.command = cmd.command.replace('lino.', `${addDevSuffix('lino')}.`);
+      if (cmd.command.startsWith(`${CONTEXT_PREFIX}.`)) {
+        cmd.command = cmd.command.replace(`${CONTEXT_PREFIX}.`, `${addDevSuffix(CONTEXT_PREFIX)}.`);
       }
       if (cmd.title && cmd.title.startsWith('Lino:')) {
         cmd.title = cmd.title.replace('Lino:', 'Lino (Dev):');
@@ -129,14 +126,14 @@ function applyDevTransformations(pkg: Record<string, unknown>): Record<string, u
     for (const binding of keybindings) {
       if (binding.when) {
         binding.when = binding.when.replace(/(\w+)(?=\s|$|==)/g, (match) => {
-          if (match.startsWith('lino') && !match.endsWith(DEV_SUFFIX)) {
+          if (match.startsWith(CONTEXT_PREFIX) && !match.endsWith(DEV_SUFFIX)) {
             return addDevSuffix(match);
           }
           return match;
         });
       }
-      if (binding.command && binding.command.startsWith('lino.')) {
-        binding.command = binding.command.replace('lino.', `${addDevSuffix('lino')}.`);
+      if (binding.command && binding.command.startsWith(`${CONTEXT_PREFIX}.`)) {
+        binding.command = binding.command.replace(`${CONTEXT_PREFIX}.`, `${addDevSuffix(CONTEXT_PREFIX)}.`);
       }
     }
   }
@@ -159,7 +156,7 @@ if (existsSync('README.md')) {
 }
 
 console.log(`\n✅ Extension installed to: ${targetDir}`);
-console.log(`   Extension name: ${extensionName}`);
+console.log(`   Extension ID: ${EXTENSION_ID_DEV}`);
 console.log(`\n🔄 Reload VSCode to activate the extension:`);
 console.log(`   - Press Ctrl+Shift+P`);
 console.log(`   - Type "Reload Window" and press Enter\n`);
