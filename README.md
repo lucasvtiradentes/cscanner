@@ -11,7 +11,7 @@
 
 </div>
 
-<a href="#"><img src="https://raw.githubusercontent.com/lucasvtiradentes/lino/main/.github/image/divider.png" /></a>
+<a href="#"><img src="./.github/image/divider.png" /></a>
 
 ## 🎺 Overview
 
@@ -19,7 +19,7 @@ High-performance TypeScript linting platform designed for instant LLM code quali
 
 <a name="TOC"></a>
 
-## ❓ Motivation<a href="#TOC"><img align="right" src="https://raw.githubusercontent.com/lucasvtiradentes/lino/main/.github/image/up_arrow.png" width="22"></a>
+## ❓ Motivation<a href="#TOC"><img align="right" src="./.github/image/up_arrow.png" width="22"></a>
 
 **Instant LLM Code Quality Feedback**
 
@@ -33,7 +33,7 @@ Every codebase has its own rules: some prefer `type` over `interface`, others ba
 
 Traditional TypeScript linters sacrifice speed for extensibility or vice versa. Lino bridges this gap by leveraging Rust's speed for core analysis (SWC-based AST parsing with Rayon parallelism) while providing a TypeScript interface for VSCode integration and custom regex rules.
 
-## ⭐ Features<a href="#TOC"><img align="right" src="https://raw.githubusercontent.com/lucasvtiradentes/lino/main/.github/image/up_arrow.png" width="22"></a>
+## ⭐ Features<a href="#TOC"><img align="right" src="./.github/image/up_arrow.png" width="22"></a>
 
 **Core Linting**
 - **23 Built-in Rules** - Comprehensive coverage across type safety, code quality, variables, imports, and bug prevention
@@ -64,7 +64,7 @@ Traditional TypeScript linters sacrifice speed for extensibility or vice versa. 
 - **GZIP Compression** - Compressed JSON-RPC responses for large datasets (80%+ reduction)
 - **Inventory-based Rule Registry** - Compile-time rule registration
 
-## 📦 Architecture<a href="#TOC"><img align="right" src="https://raw.githubusercontent.com/lucasvtiradentes/lino/main/.github/image/up_arrow.png" width="22"></a>
+## 📦 Architecture<a href="#TOC"><img align="right" src="./.github/image/up_arrow.png" width="22"></a>
 
 Hybrid Rust + TypeScript architecture with JSON-RPC communication:
 
@@ -92,7 +92,7 @@ VSCode Extension (TypeScript)         lino-server (Rust)
                                          └─ Hash-based invalidation
 ```
 
-## 🚀 Quick Start<a href="#TOC"><img align="right" src="https://raw.githubusercontent.com/lucasvtiradentes/lino/main/.github/image/up_arrow.png" width="22"></a>
+## 🚀 Quick Start<a href="#TOC"><img align="right" src="./.github/image/up_arrow.png" width="22"></a>
 
 ### Prerequisites
 
@@ -123,7 +123,7 @@ cd packages/lino-core
 cargo watch -x build
 ```
 
-## 📦 Package Structure<a href="#TOC"><img align="right" src="https://raw.githubusercontent.com/lucasvtiradentes/lino/main/.github/image/up_arrow.png" width="22"></a>
+## 📦 Package Structure<a href="#TOC"><img align="right" src="./.github/image/up_arrow.png" width="22"></a>
 
 ### lino-core (Rust)
 
@@ -141,7 +141,7 @@ VSCode extension for editor integration with real-time feedback.
 
 [Detailed Documentation →](packages/vscode-extension/README.md)
 
-## 🔧 Development<a href="#TOC"><img align="right" src="https://raw.githubusercontent.com/lucasvtiradentes/lino/main/.github/image/up_arrow.png" width="22"></a>
+## 🔧 Development<a href="#TOC"><img align="right" src="./.github/image/up_arrow.png" width="22"></a>
 
 ### Build Commands
 
@@ -228,7 +228,7 @@ import { utils } from "../utils";    // ❌ Caught by no-relative-imports
 // TODO: implement error handling    // ⚠️  Caught by custom-todo-pattern
 ```
 
-## 🎯 Performance Status<a href="#TOC"><img align="right" src="https://raw.githubusercontent.com/lucasvtiradentes/lino/main/.github/image/up_arrow.png" width="22"></a>
+## 🎯 Performance Status<a href="#TOC"><img align="right" src="./.github/image/up_arrow.png" width="22"></a>
 
 | Codebase | Phase 0 (TS) | Phase 1 (Rust) | Target (Phase 2) |
 |----------|--------------|----------------|------------------|
@@ -242,6 +242,6 @@ import { utils } from "../utils";    // ❌ Caught by no-relative-imports
 - ✅ GZIP compression for large results (80%+ reduction)
 - ⏳ Further optimization needed for Phase 2 targets
 
-## 📜 License<a href="#TOC"><img align="right" src="https://raw.githubusercontent.com/lucasvtiradentes/lino/main/.github/image/up_arrow.png" width="22"></a>
+## 📜 License<a href="#TOC"><img align="right" src="./.github/image/up_arrow.png" width="22"></a>
 
 MIT License - see [LICENSE](LICENSE) file for details.
