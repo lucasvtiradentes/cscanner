@@ -1,5 +1,5 @@
 {
-  "name": "@cscan/darwin-arm64",
+  "name": "cscanner-darwin-arm64",
   "version": "1.0.2",
   "description": "cscan binary for macOS ARM64 (Apple Silicon)",
   "license": "MIT",

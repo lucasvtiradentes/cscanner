@@ -16,12 +16,25 @@
     "build": {
       "outputLogs": "new-only",
       "dependsOn": ["^build"],
-      "outputs": ["dist/**", "out/**", "target/release/**", "binaries/**"]
+      "outputs": ["dist/**", "out/**", "target/release/**", "binaries/**"],
+      "inputs": [
+        "src/**",
+        "crates/**",
+        "scripts/**",
+        "*.config.*",
+        "tsconfig.json",
+        "Cargo.toml",
+        "Cargo.lock",
+        "package.json"
+      ]
     },
     "build:rust": {
       "outputLogs": "new-only",
       "outputs": [
-        "target/release/**"
+        "target/release/cscan",
+        "target/release/cscan.exe",
+        "target/release/cscan-server",
+        "target/release/cscan-server.exe"
       ],
       "inputs": [
         "src/**",
@@ -53,11 +66,11 @@
     },
     "clippy": {
       "outputLogs": "new-only",
-      "cache": false,
       "inputs": [
         "./src/**",
         "./crates/**",
-        "./Cargo.toml"
+        "./Cargo.toml",
+        "./Cargo.lock"
       ]
     },
     "format": {

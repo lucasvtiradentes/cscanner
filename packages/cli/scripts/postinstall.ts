@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 
 const PLATFORM_MAP: Record<string, string> = {
-  'linux-x64': '@cscan/linux-x64',
-  'linux-arm64': '@cscan/linux-arm64',
-  'darwin-x64': '@cscan/darwin-x64',
-  'darwin-arm64': '@cscan/darwin-arm64',
-  'win32-x64': '@cscan/win32-x64',
+  'linux-x64': 'cscanner-linux-x64',
+  'linux-arm64': 'cscanner-linux-arm64',
+  'darwin-x64': 'cscanner-darwin-x64',
+  'darwin-arm64': 'cscanner-darwin-arm64',
+  'win32-x64': 'cscanner-win32-x64',
 };
 
 function getPlatformKey(): string | null {

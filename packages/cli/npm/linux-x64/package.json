@@ -1,5 +1,5 @@
 {
-  "name": "@cscan/linux-x64",
+  "name": "cscanner-linux-x64",
   "version": "1.0.2",
   "description": "cscan binary for Linux x64",
   "license": "MIT",
