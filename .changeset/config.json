@@ -4,18 +4,17 @@
   "commit": false,
   "fixed": [
     [
-      "cscan-vscode",
-      "cscan",
-      "@cscan/linux-x64",
-      "@cscan/linux-arm64",
-      "@cscan/darwin-x64",
-      "@cscan/darwin-arm64",
-      "@cscan/win32-x64"
+      "cscanner",
+      "cscanner-linux-x64",
+      "cscanner-linux-arm64",
+      "cscanner-darwin-x64",
+      "cscanner-darwin-arm64",
+      "cscanner-win32-x64"
     ]
   ],
   "linked": [],
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": ["cscan-core"]
+  "ignore": ["cscanner-core"]
 }

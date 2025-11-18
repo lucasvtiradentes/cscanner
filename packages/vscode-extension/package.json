@@ -1,6 +1,6 @@
 {
-  "name": "cscan-vscode",
-  "displayName": "Code Scanner (cscan)",
+  "name": "cscanner-vscode",
+  "displayName": "Code Scanner (cscanner)",
   "description": "High-performance TypeScript code quality scanner with custom rules, Git integration, and instant LLM feedback",
   "version": "1.0.2",
   "publisher": "lucasvtiradentes",

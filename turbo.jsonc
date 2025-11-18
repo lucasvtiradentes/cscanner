@@ -43,15 +43,15 @@
         "Cargo.lock"
       ]
     },
-    "cscan-core#build": {
+    "cscanner-core#build": {
       "outputLogs": "new-only",
       "outputs": [
         "target/release/**"
       ]
     },
-    "cscan-vscode#build": {
+    "cscanner-vscode#build": {
       "outputLogs": "new-only",
-      "dependsOn": ["cscan-core#build"],
+      "dependsOn": ["cscanner-core#build"],
       "outputs": ["out/**", "binaries/**"],
       "inputs": ["./src/**", "./esbuild.config.ts", "./package.json", "../cscan-core/target/release/**"]
     },
