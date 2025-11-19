@@ -16,7 +16,12 @@ for package in packages/cli/npm/cli-*; do
 done
 
 echo "Publishing main CLI package..."
-npm publish packages/cli --access public
+cd packages/cli
+npm pack
+TARBALL=$(ls cscanner-*.tgz | tail -1)
+npm publish "$TARBALL" --access public
+rm "$TARBALL"
+cd ../..
 
 echo ""
 echo "✅ npm packages published!"
