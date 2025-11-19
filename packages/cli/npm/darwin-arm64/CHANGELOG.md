@@ -1,4 +1,4 @@
-# cscanner-darwin-arm64
+# cscanner-bin-darwin-arm64
 
 ## 2.0.2
 

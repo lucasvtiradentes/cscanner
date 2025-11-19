@@ -1,4 +1,4 @@
-# cscanner-win32-x64
+# cscanner-bin-win32-x64
 
 ## 2.0.2
 

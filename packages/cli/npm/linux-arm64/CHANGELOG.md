@@ -1,4 +1,4 @@
-# cscanner-linux-arm64
+# cscanner-bin-linux-arm64
 
 ## 2.0.2
 

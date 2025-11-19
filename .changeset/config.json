@@ -5,11 +5,11 @@
   "fixed": [
     [
       "cscanner",
-      "cscanner-linux-x64",
-      "cscanner-linux-arm64",
-      "cscanner-darwin-x64",
-      "cscanner-darwin-arm64",
-      "cscanner-win32-x64"
+      "cscanner-bin-linux-x64",
+      "cscanner-bin-linux-arm64",
+      "cscanner-bin-darwin-x64",
+      "cscanner-bin-darwin-arm64",
+      "cscanner-bin-win32-x64"
     ]
   ],
   "linked": [],

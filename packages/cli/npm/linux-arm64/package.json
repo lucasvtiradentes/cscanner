@@ -1,5 +1,5 @@
 {
-  "name": "cscanner-linux-arm64",
+  "name": "cscanner-bin-linux-arm64",
   "version": "2.0.2",
   "description": "cscanner binary for Linux ARM64",
   "license": "MIT",

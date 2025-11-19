@@ -1,4 +1,4 @@
-# cscanner-linux-x64
+# cscanner-bin-linux-x64
 
 ## 2.0.2
 

@@ -1,5 +1,5 @@
 {
-  "name": "cscanner-darwin-x64",
+  "name": "cscanner-bin-darwin-x64",
   "version": "2.0.2",
   "description": "cscanner binary for macOS x64",
   "license": "MIT",

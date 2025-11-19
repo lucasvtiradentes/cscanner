@@ -1,5 +1,5 @@
 {
-  "name": "cscanner-win32-x64",
+  "name": "cscanner-bin-win32-x64",
   "version": "2.0.2",
   "description": "cscanner binary for Windows x64",
   "license": "MIT",

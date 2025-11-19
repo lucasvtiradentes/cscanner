@@ -4,11 +4,11 @@ const { chmodSync } = require('fs');
 const { join } = require('path');
 
 const PLATFORM_MAP = {
-  'linux-x64': 'cscanner-linux-x64',
-  'linux-arm64': 'cscanner-linux-arm64',
-  'darwin-x64': 'cscanner-darwin-x64',
-  'darwin-arm64': 'cscanner-darwin-arm64',
-  'win32-x64': 'cscanner-win32-x64',
+  'linux-x64': 'cscanner-bin-linux-x64',
+  'linux-arm64': 'cscanner-bin-linux-arm64',
+  'darwin-x64': 'cscanner-bin-darwin-x64',
+  'darwin-arm64': 'cscanner-bin-darwin-arm64',
+  'win32-x64': 'cscanner-bin-win32-x64',
 };
 
 function getPlatformKey() {
