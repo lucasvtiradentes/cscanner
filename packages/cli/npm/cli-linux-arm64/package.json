@@ -2,11 +2,7 @@
   "name": "@cscanner/cli-linux-arm64",
   "version": "2.0.4",
   "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/lucasvtiradentes/cscanner.git",
-    "directory": "packages/cli/npm/cli-linux-arm64"
-  },
+  "repository": "https://github.com/lucasvtiradentes/cscanner.git",
   "os": [
     "linux"
   ],

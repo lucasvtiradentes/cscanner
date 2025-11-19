@@ -22,10 +22,7 @@ function copyBinaryToNativePackage(platform, arch) {
       name: packageName,
       version,
       license,
-      repository: {
-        ...repository,
-        directory: `packages/cli/npm/${buildName}`
-      },
+      repository: repository.url,
       os: [os],
       cpu: [arch],
       files: [os === "win32" ? "cscanner.exe" : "cscanner"]
