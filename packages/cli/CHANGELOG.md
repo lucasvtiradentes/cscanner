@@ -1,5 +1,11 @@
 # cscanner
 
+## 2.0.2
+
+### Patch Changes
+
+- 4302bba: fix cicd error
+
 ## 2.0.1
 
 ### Patch Changes
