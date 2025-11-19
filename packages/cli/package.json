@@ -10,13 +10,9 @@
     "directory": "packages/cli"
   },
   "bin": {
-    "cscanner": "./dist/src/cscanner.js"
+    "cscanner": "./dist/cscanner.js"
   },
-  "files": [
-    "dist",
-    "npm",
-    "postinstall.cjs"
-  ],
+  "files": ["dist", "postinstall.cjs"],
   "optionalDependencies": {
     "cscanner-linux-x64": "workspace:*",
     "cscanner-linux-arm64": "workspace:*",
@@ -27,7 +23,7 @@
   "scripts": {
     "postinstall": "node postinstall.cjs",
     "build": "tsc && ./scripts/copy-binaries.sh",
-    "start": "node ./dist/src/cscanner.js",
+    "start": "node ./dist/cscanner.js",
     "typecheck": "tsc --noEmit",
     "lint": "biome check src scripts/*.ts",
     "format": "biome format --write src scripts/*.ts",
