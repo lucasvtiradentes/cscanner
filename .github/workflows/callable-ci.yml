@@ -45,11 +45,16 @@ jobs:
           CURRENT_VERSION=$(node -p "require('./$VSCODE_PKG').version")
           PREVIOUS_VERSION=$(git show HEAD^:./$VSCODE_PKG 2>/dev/null | node -p "try { JSON.parse(require('fs').readFileSync('/dev/stdin', 'utf-8')).version } catch(e) { '' }" || echo "")
 
+          PKG_CHANGED=$(git diff --name-only HEAD^ HEAD | grep -q "^packages/vscode-extension/package\.json$" && echo "true" || echo "false")
+
           if [ -n "$PREVIOUS_VERSION" ] && [ "$PREVIOUS_VERSION" != "$CURRENT_VERSION" ]; then
             echo "Version bumped: $PREVIOUS_VERSION → $CURRENT_VERSION"
             echo "should_build=true" >> $GITHUB_OUTPUT
+          elif [ "$PKG_CHANGED" = "true" ]; then
+            echo "package.json modified (version: $CURRENT_VERSION)"
+            echo "should_build=true" >> $GITHUB_OUTPUT
           else
-            echo "Version not changed"
+            echo "No package.json changes or version bump"
             echo "should_build=false" >> $GITHUB_OUTPUT
           fi
 
