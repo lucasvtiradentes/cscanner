@@ -10,7 +10,7 @@ function getPlatformTarget(): string | null {
   const target = PLATFORM_TARGET_MAP[platform];
 
   if (!target) {
-    console.warn(`Unsupported platform: ${platform}. Cscan Rust core will not be available.`);
+    console.warn(`Unsupported platform: ${platform}. Cscanner Rust core will not be available.`);
     return null;
   }
 
@@ -81,26 +81,26 @@ function checkLocalBinary(): boolean {
 }
 
 async function main(): Promise<void> {
-  console.log('Cscan: Checking for Rust binary...');
+  console.log('Cscanner: Checking for Rust binary...');
 
   ensureBinaryDir();
 
   if (checkLocalBinary()) {
-    console.log('Cscan: Development mode - using local Rust binary from packages/core/target/debug/');
+    console.log('Cscanner: Development mode - using local Rust binary from packages/core/target/debug/');
     return;
   }
 
   const target = getPlatformTarget();
 
   if (!target) {
-    console.log('Cscan: Rust core not available for this platform. Extension will use TypeScript implementation.');
+    console.log('Cscanner: Rust core not available for this platform. Extension will use TypeScript implementation.');
     return;
   }
 
   const binaryPath = getBinaryPath(target);
 
   if (fs.existsSync(binaryPath)) {
-    console.log(`Cscan: Binary already exists at ${binaryPath}`);
+    console.log(`Cscanner: Binary already exists at ${binaryPath}`);
     return;
   }
 
@@ -108,12 +108,12 @@ async function main(): Promise<void> {
     const downloaded = await downloadBinary(target);
     if (!downloaded) {
       console.log(
-        'Cscan: Binary download skipped. Extension will use TypeScript implementation until Rust core is released.',
+        'Cscanner: Binary download skipped. Extension will use TypeScript implementation until Rust core is released.',
       );
     }
   } catch (error) {
-    console.warn(`Cscan: Failed to download binary: ${(error as Error).message}`);
-    console.log('Cscan: Extension will use TypeScript implementation.');
+    console.warn(`Cscanner: Failed to download binary: ${(error as Error).message}`);
+    console.log('Cscanner: Extension will use TypeScript implementation.');
   }
 }
 

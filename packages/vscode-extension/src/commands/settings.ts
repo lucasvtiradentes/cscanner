@@ -24,13 +24,13 @@ export function createOpenSettingsMenuCommand(
         detail: 'Choose between Codebase or Branch scan mode',
       },
       {
-        label: '$(edit) Open Project Cscan Configs',
+        label: '$(edit) Open Project Cscanner Configs',
         detail: 'Edit .cscanner/rules.json or global extension config',
       },
     ];
 
     const selected = await vscode.window.showQuickPick(mainMenuItems, {
-      placeHolder: 'Cscan Settings',
+      placeHolder: 'Cscanner Settings',
       ignoreFocusOut: false,
     });
 
@@ -46,14 +46,14 @@ export function createOpenSettingsMenuCommand(
       return;
     }
 
-    if (selected.label.includes('Open Project Cscan Configs')) {
-      await openProjectCscanConfigs(context);
+    if (selected.label.includes('Open Project Cscanner Configs')) {
+      await openProjectCscannerConfigs(context);
       return;
     }
   });
 }
 
-async function openProjectCscanConfigs(context: vscode.ExtensionContext) {
+async function openProjectCscannerConfigs(context: vscode.ExtensionContext) {
   const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
 
   if (!workspaceFolder) {
@@ -81,7 +81,7 @@ async function openProjectCscanConfigs(context: vscode.ExtensionContext) {
     logger.debug('Global config not found');
   }
 
-  vscode.window.showErrorMessage('No Cscan configuration found. Create one via "Manage Rules" first.');
+  vscode.window.showErrorMessage('No Cscanner configuration found. Create one via "Manage Rules" first.');
 }
 
 async function showScanSettingsMenu(
@@ -115,7 +115,7 @@ async function showScanSettingsMenu(
     searchProvider.setResults([]);
     currentScanModeRef.current = 'workspace';
     context.workspaceState.update('cscanner.scanMode', 'workspace');
-    vscode.commands.executeCommand('setContext', getContextKey('cscanScanMode'), 'workspace');
+    vscode.commands.executeCommand('setContext', getContextKey('cscannerScanMode'), 'workspace');
     invalidateCache();
     updateStatusBar();
     vscode.commands.executeCommand(getCommandId('findIssue'));
@@ -204,7 +204,7 @@ async function showScanSettingsMenu(
     searchProvider.setResults([]);
     currentScanModeRef.current = 'branch';
     context.workspaceState.update('cscanner.scanMode', 'branch');
-    vscode.commands.executeCommand('setContext', getContextKey('cscanScanMode'), 'branch');
+    vscode.commands.executeCommand('setContext', getContextKey('cscannerScanMode'), 'branch');
     invalidateCache();
     updateStatusBar();
     vscode.commands.executeCommand(getCommandId('findIssue'));

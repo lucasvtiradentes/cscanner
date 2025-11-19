@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { getCommandId } from '../common/constants';
 import {
-  CscanConfig,
+  CscannerConfig,
   getDefaultConfig,
   loadEffectiveConfig,
   saveGlobalConfig,
@@ -44,7 +44,7 @@ export function createManageRulesCommand(updateStatusBar: () => Promise<void>, c
 
     const binaryPath = getRustBinaryPath();
     if (!binaryPath) {
-      vscode.window.showErrorMessage('Cscan: Rust binary not found. Please build the Rust core first.');
+      vscode.window.showErrorMessage('Cscanner: Rust binary not found. Please build the Rust core first.');
       return;
     }
 
@@ -148,7 +148,7 @@ export function createManageRulesCommand(updateStatusBar: () => Promise<void>, c
 
       logger.info(`User selected ${enabledRules.size} rules: ${Array.from(enabledRules).join(', ')}`);
 
-      const config: CscanConfig = existingConfig;
+      const config: CscannerConfig = existingConfig;
 
       if (!config.rules) {
         config.rules = {};

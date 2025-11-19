@@ -1,17 +1,16 @@
+import { IS_DEV } from './utils/is-dev';
+
 export const EXTENSION_PUBLISHER = 'lucasvtiradentes';
 export const EXTENSION_NAME = 'cscanner-vscode';
 export const EXTENSION_ID_PROD = `${EXTENSION_PUBLISHER}.${EXTENSION_NAME}`;
 export const EXTENSION_ID_DEV = `${EXTENSION_PUBLISHER}.${EXTENSION_NAME}-dev`;
-export const EXTENSION_DISPLAY_NAME = 'Cscan';
+export const EXTENSION_DISPLAY_NAME = 'Cscanner';
 
 export const CONTEXT_PREFIX = 'cscanner';
 export const VIEW_CONTAINER_ID = 'cscanner';
-export const VIEW_ID = 'cscanExplorer';
+export const VIEW_ID = 'cscannerExplorer';
 
 export const DEV_SUFFIX = 'Dev';
-
-declare const __IS_DEV_BUILD__: boolean;
-const IS_DEV = typeof __IS_DEV_BUILD__ !== 'undefined' && __IS_DEV_BUILD__;
 
 export function getCommandId(command: string): string {
   return IS_DEV ? `${CONTEXT_PREFIX}${DEV_SUFFIX}.${command}` : `${CONTEXT_PREFIX}.${command}`;

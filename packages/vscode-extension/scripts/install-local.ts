@@ -89,6 +89,16 @@ function applyDevTransformations(pkg: Record<string, unknown>): Record<string, u
     contributes.views = newViews;
   }
 
+  if (contributes.viewsWelcome) {
+    const viewsWelcome = contributes.viewsWelcome as Array<{ view: string; contents: string; when?: string }>;
+    for (const welcome of viewsWelcome) {
+      if (welcome.view.startsWith(CONTEXT_PREFIX)) {
+        welcome.view = welcome.view.replace(CONTEXT_PREFIX, addDevSuffix(CONTEXT_PREFIX));
+      }
+      welcome.view = welcome.view.replace(/Explorer$/, 'ExplorerDev');
+    }
+  }
+
   if (contributes.menus) {
     const menus = contributes.menus as Record<string, Array<{ when?: string; command?: string }>>;
 
@@ -115,8 +125,12 @@ function applyDevTransformations(pkg: Record<string, unknown>): Record<string, u
       if (cmd.command.startsWith(`${CONTEXT_PREFIX}.`)) {
         cmd.command = cmd.command.replace(`${CONTEXT_PREFIX}.`, `${addDevSuffix(CONTEXT_PREFIX)}.`);
       }
-      if (cmd.title && cmd.title.startsWith('Cscan:')) {
-        cmd.title = cmd.title.replace('Cscan:', 'Cscan (Dev):');
+      if (cmd.title) {
+        if (cmd.title.startsWith('Cscanner:')) {
+          cmd.title = cmd.title.replace('Cscanner:', 'Cscanner (Dev):');
+        } else if (cmd.title.startsWith('cscanner:')) {
+          cmd.title = cmd.title.replace('cscanner:', 'cscanner (Dev):');
+        }
       }
       if (cmd.enablement) {
         cmd.enablement = cmd.enablement.replace(/(\w+)(?=\s|$|==)/g, (match) => {
@@ -153,8 +167,18 @@ copyRecursive('out', join(targetDir, 'out'));
 copyRecursive('resources', join(targetDir, 'resources'));
 
 const extensionJs = readFileSync(join(targetDir, 'out', 'extension.js'), 'utf8');
-const devSuffixPattern = /Qe="Dev",([A-Za-z]+)=!1/;
-const patchedExtensionJs = extensionJs.replace(devSuffixPattern, 'Qe="Dev",$1=!0');
+const isDevUnminified = /var IS_DEV = false;/;
+const logFilePattern = /cscannerlogs\.txt/g;
+const statusBarPattern = /Cscanner:/g;
+let patchedExtensionJs = extensionJs;
+
+if (isDevUnminified.test(patchedExtensionJs)) {
+  patchedExtensionJs = patchedExtensionJs.replace(isDevUnminified, 'var IS_DEV = true;');
+} else {
+  patchedExtensionJs = patchedExtensionJs.replace(logFilePattern, 'cscannerlogs-dev.txt');
+  patchedExtensionJs = patchedExtensionJs.replace(statusBarPattern, 'Cscanner (Dev):');
+}
+
 writeFileSync(join(targetDir, 'out', 'extension.js'), patchedExtensionJs);
 
 const modifiedPackageJson = applyDevTransformations(packageJson);

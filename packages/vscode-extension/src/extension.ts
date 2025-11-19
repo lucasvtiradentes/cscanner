@@ -1,9 +1,8 @@
 import * as vscode from 'vscode';
 import { registerAllCommands } from './commands';
-import { getContextKey } from './common/constants';
+import { getContextKey, getViewId } from './common/constants';
 import { loadEffectiveConfig } from './common/lib/config-manager';
 import { dispose as disposeScanner, scanContent } from './common/lib/scanner';
-import { getViewId } from './common/utils/extension-helper';
 import { getChangedFiles, getModifiedLineRanges, invalidateCache } from './common/utils/git-helper';
 import { getNewIssues } from './common/utils/issue-comparator';
 import { logger } from './common/utils/logger';
@@ -22,7 +21,7 @@ export function activate(context: vscode.ExtensionContext) {
   }
 
   activationKey = currentKey;
-  logger.info('Cscan extension activated');
+  logger.info('Cscanner extension activated');
 
   const searchProvider = new SearchResultProvider();
   const viewModeKey = context.workspaceState.get<'list' | 'tree'>('cscanner.viewMode', 'list');
@@ -40,9 +39,9 @@ export function activate(context: vscode.ExtensionContext) {
   }));
   searchProvider.setResults(deserializedResults);
 
-  vscode.commands.executeCommand('setContext', getContextKey('cscanViewMode'), viewModeKey);
+  vscode.commands.executeCommand('setContext', getContextKey('cscannerViewMode'), viewModeKey);
   vscode.commands.executeCommand('setContext', getContextKey('cscanGroupMode'), groupModeKey);
-  vscode.commands.executeCommand('setContext', getContextKey('cscanScanMode'), scanModeKey);
+  vscode.commands.executeCommand('setContext', getContextKey('cscannerScanMode'), scanModeKey);
 
   const viewId = getViewId();
   logger.info(`Registering tree view with ID: ${viewId}`);

@@ -6,7 +6,7 @@ export function createSetListViewCommand(searchProvider: SearchResultProvider, c
   return vscode.commands.registerCommand(getCommandId('setListView'), () => {
     searchProvider.viewMode = 'list';
     context.workspaceState.update('cscanner.viewMode', 'list');
-    vscode.commands.executeCommand('setContext', getContextKey('cscanViewMode'), 'list');
+    vscode.commands.executeCommand('setContext', getContextKey('cscannerViewMode'), 'list');
   });
 }
 
@@ -14,7 +14,7 @@ export function createSetTreeViewCommand(searchProvider: SearchResultProvider, c
   return vscode.commands.registerCommand(getCommandId('setTreeView'), () => {
     searchProvider.viewMode = 'tree';
     context.workspaceState.update('cscanner.viewMode', 'tree');
-    vscode.commands.executeCommand('setContext', getContextKey('cscanViewMode'), 'tree');
+    vscode.commands.executeCommand('setContext', getContextKey('cscannerViewMode'), 'tree');
   });
 }
 
