@@ -37,6 +37,7 @@
     "build": "tsx esbuild.config.ts",
     "postbuild": "tsx scripts/copy-binaries.ts && tsx scripts/install-local.ts",
     "lint": "biome check src",
+    "lint:fix": "biome check --fix --unsafe src",
     "format": "biome format --write src",
     "typecheck": "tsc --noEmit",
     "vscode:prepublish": "pnpm run build",
