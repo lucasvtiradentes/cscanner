@@ -1,5 +1,11 @@
 # cscanner-vscode
 
+## 2.0.11
+
+### Patch Changes
+
+- ee30268: refactor code
+
 ## 2.0.10
 
 ### Patch Changes
