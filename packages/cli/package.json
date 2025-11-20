@@ -3,7 +3,6 @@
   "version": "0.0.3",
   "description": "High-performance TypeScript/TSX code quality scanner - CLI",
   "license": "MIT",
-  "type": "module",
   "repository": {
     "type": "git",
     "url": "https://github.com/lucasvtiradentes/tscanner.git"
@@ -11,9 +10,9 @@
   "bin": {
     "tscanner": "./dist/main.js"
   },
-  "files": ["dist", "postinstall.cjs"],
+  "files": ["dist", "postinstall.js"],
   "scripts": {
-    "postinstall": "node postinstall.cjs",
+    "postinstall": "node postinstall.js",
     "build": "tsup",
     "postbuild": "npm run script:install-local",
     "start": "node ./dist/main.js",

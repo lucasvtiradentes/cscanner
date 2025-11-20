@@ -1,9 +1,6 @@
 import { existsSync } from 'node:fs';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { join } from 'node:path';
 import { PLATFORM_MAP, getBinaryName, getPlatformKey } from './platform';
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export function getBinaryPath(): string {
   const platformKey = getPlatformKey();
@@ -21,11 +18,8 @@ export function getBinaryPath(): string {
   }
 
   try {
-    const packagePath = join(__dirname, '..', 'node_modules', packageName, binaryName);
-    if (existsSync(packagePath)) {
-      return packagePath;
-    }
-    throw new Error('Binary not found in node_modules');
+    const binaryPath = require.resolve(`${packageName}/${binaryName}`);
+    return binaryPath;
   } catch (e) {
     const error = e as Error;
     throw new Error(
