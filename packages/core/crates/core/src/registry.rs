@@ -47,7 +47,10 @@ impl RuleRegistry {
                                 .insert(rule_name.clone(), Arc::new(regex_rule));
                         }
                         Err(e) => {
-                            tracing::error!("Failed to compile regex rule '{}': {}", rule_name, e);
+                            crate::log_error(&format!(
+                                "Failed to compile regex rule '{}': {}",
+                                rule_name, e
+                            ));
                             continue;
                         }
                     }
@@ -66,11 +69,11 @@ impl RuleRegistry {
             .values()
             .filter(|c| c.enabled)
             .count();
-        tracing::info!(
+        crate::log_info(&format!(
             "Loaded {} rules ({} enabled)",
             registry.rules.len(),
             enabled_count
-        );
+        ));
 
         Ok(registry)
     }

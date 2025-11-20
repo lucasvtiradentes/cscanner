@@ -2,7 +2,6 @@ use base64::Engine;
 use flate2::write::GzEncoder;
 use flate2::Compression;
 use std::io::{self, BufRead, Write};
-use tracing::{error, info};
 
 mod handlers;
 mod protocol;
@@ -13,32 +12,8 @@ use protocol::*;
 use state::ServerState;
 
 fn main() {
-    use time::macros::format_description;
-    use time::UtcOffset;
-    use tracing_subscriber::fmt::time::OffsetTime;
-    use tracing_subscriber::fmt::Layer;
-    use tracing_subscriber::layer::SubscriberExt;
-    use tracing_subscriber::util::SubscriberInitExt;
-
     core::init_logger();
-
-    let offset = UtcOffset::from_hms(-3, 0, 0).unwrap();
-    let format = format_description!("[year]-[month]-[day]T[hour]:[minute]:[second].[subsecond digits:3][offset_hour sign:mandatory]:[offset_minute]");
-    let timer = OffsetTime::new(offset, format);
-
-    tracing_subscriber::registry()
-        .with(
-            Layer::new()
-                .with_writer(io::stderr)
-                .with_ansi(false)
-                .with_target(false)
-                .with_level(true)
-                .with_timer(timer),
-        )
-        .with(tracing_subscriber::filter::LevelFilter::WARN)
-        .init();
-
-    info!("Tscanner server started");
+    core::log_info("Tscanner server started");
 
     let mut state = ServerState::new();
     let stdin = io::stdin();
@@ -48,7 +23,7 @@ fn main() {
         let line = match line {
             Ok(l) => l,
             Err(e) => {
-                error!("Failed to read line: {}", e);
+                core::log_error(&format!("Failed to read line: {}", e));
                 continue;
             }
         };
@@ -60,7 +35,7 @@ fn main() {
         let request: Request = match serde_json::from_str(&line) {
             Ok(r) => r,
             Err(e) => {
-                error!("Failed to parse request: {}", e);
+                core::log_error(&format!("Failed to parse request: {}", e));
                 continue;
             }
         };
@@ -125,13 +100,13 @@ fn send_response(stdout: &mut io::Stdout, response: Response) {
         let compress_start = std::time::Instant::now();
         let mut encoder = GzEncoder::new(Vec::new(), Compression::fast());
         if let Err(e) = encoder.write_all(json.as_bytes()) {
-            error!("Failed to compress: {}", e);
+            core::log_error(&format!("Failed to compress: {}", e));
         } else if let Ok(compressed) = encoder.finish() {
             let compress_time = compress_start.elapsed();
             let compressed_size = compressed.len();
 
             if serialize_time.as_millis() > 50 || compress_time.as_millis() > 50 {
-                info!(
+                core::log_debug(&format!(
                     "Serialization took {}ms ({}KB), compression took {}ms ({}KB → {}KB, {:.1}%)",
                     serialize_time.as_millis(),
                     original_size / 1024,
@@ -139,35 +114,35 @@ fn send_response(stdout: &mut io::Stdout, response: Response) {
                     original_size / 1024,
                     compressed_size / 1024,
                     (compressed_size as f64 / original_size as f64) * 100.0
-                );
+                ));
             }
 
             let write_start = std::time::Instant::now();
             if let Err(e) = stdout.write_all(b"GZIP:") {
-                error!("Failed to write marker: {}", e);
+                core::log_error(&format!("Failed to write marker: {}", e));
             } else {
                 let encoded = base64::engine::general_purpose::STANDARD.encode(&compressed);
                 if let Err(e) = stdout.write_all(encoded.as_bytes()) {
-                    error!("Failed to write compressed data: {}", e);
+                    core::log_error(&format!("Failed to write compressed data: {}", e));
                 }
                 if let Err(e) = stdout.write_all(b"\n") {
-                    error!("Failed to write newline: {}", e);
+                    core::log_error(&format!("Failed to write newline: {}", e));
                 }
             }
             let write_time = write_start.elapsed();
 
             let flush_start = std::time::Instant::now();
             if let Err(e) = stdout.flush() {
-                error!("Failed to flush stdout: {}", e);
+                core::log_error(&format!("Failed to flush stdout: {}", e));
             }
             let flush_time = flush_start.elapsed();
 
             if write_time.as_millis() > 50 || flush_time.as_millis() > 50 {
-                info!(
+                core::log_debug(&format!(
                     "Write took {}ms, flush took {}ms",
                     write_time.as_millis(),
                     flush_time.as_millis()
-                );
+                ));
             }
         }
     }
@@ -176,7 +151,7 @@ fn send_response(stdout: &mut io::Stdout, response: Response) {
 fn process_file_events(state: &ServerState, stdout: &mut io::Stdout) {
     if let Some(watcher) = &state.watcher {
         while let Some(event) = watcher.try_recv() {
-            info!("File event: {:?}", event);
+            core::log_debug(&format!("File event: {:?}", event));
 
             use core::watcher::FileEvent;
             match event {

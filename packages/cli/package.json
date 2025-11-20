@@ -9,31 +9,32 @@
     "url": "https://github.com/lucasvtiradentes/tscanner.git"
   },
   "bin": {
-    "tscanner": "./dist/tscanner.js"
+    "tscanner": "./dist/main.js"
   },
-  "files": [
-    "dist",
-    "postinstall.cjs"
-  ],
-  "optionalDependencies": {
-    "@tscanner/cli-linux-x64": "0.0.2",
-    "@tscanner/cli-linux-arm64": "0.0.2",
-    "@tscanner/cli-darwin-x64": "0.0.2",
-    "@tscanner/cli-darwin-arm64": "0.0.2",
-    "@tscanner/cli-win32-x64": "0.0.2"
-  },
+  "files": ["dist", "postinstall.cjs"],
   "scripts": {
     "postinstall": "node postinstall.cjs",
-    "build": "tsc && tsx scripts/copy-binaries.ts",
-    "start": "node ./dist/tscanner.js",
+    "build": "tsup",
+    "postbuild": "npm run script:install-local",
+    "start": "node ./dist/main.js",
     "typecheck": "tsc --noEmit",
     "lint": "biome check src",
     "lint:fix": "biome check --fix --unsafe src",
     "format": "biome format --write src scripts/*.ts",
-    "prepublishOnly": "pnpm run build"
+    "prepublishOnly": "pnpm run build",
+    "script:install-local": "tsx scripts/install-local.ts",
+    "script:fix-packages": "tsx scripts/generate-packages.ts"
+  },
+  "optionalDependencies": {
+    "@tscanner/cli-darwin-arm64": "0.0.2",
+    "@tscanner/cli-darwin-x64": "0.0.2",
+    "@tscanner/cli-linux-arm64": "0.0.2",
+    "@tscanner/cli-linux-x64": "0.0.2",
+    "@tscanner/cli-win32-x64": "0.0.2"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
+    "tsup": "^8.5.1",
     "tsx": "^4.19.2",
     "typescript": "^5.7.0"
   }

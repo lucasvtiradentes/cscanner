@@ -10,7 +10,6 @@ use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::Arc;
 use std::time::Instant;
-use tracing::{debug, info};
 
 pub struct Scanner {
     registry: RuleRegistry,
@@ -43,7 +42,7 @@ impl Scanner {
 
     pub fn scan(&self, root: &Path) -> ScanResult {
         let start = Instant::now();
-        info!("Starting scan of {:?}", root);
+        crate::log_info(&format!("Starting scan of {:?}", root));
 
         let files: Vec<PathBuf> = WalkBuilder::new(root)
             .hidden(false)
@@ -67,7 +66,7 @@ impl Scanner {
             .collect();
 
         let file_count = files.len();
-        info!("Found {} TypeScript files", file_count);
+        crate::log_debug(&format!("Found {} TypeScript files", file_count));
 
         let processed = AtomicUsize::new(0);
         let cache_hits = AtomicUsize::new(0);
@@ -120,7 +119,7 @@ impl Scanner {
         let program = match parse_file(path, content) {
             Ok(p) => p,
             Err(e) => {
-                debug!("Failed to parse {:?}: {}", path, e);
+                crate::log_debug(&format!("Failed to parse {:?}: {}", path, e));
                 return None;
             }
         };
@@ -166,7 +165,7 @@ impl Scanner {
         let program = match parse_file(path, &source) {
             Ok(p) => p,
             Err(e) => {
-                debug!("Failed to parse {:?}: {}", path, e);
+                crate::log_debug(&format!("Failed to parse {:?}: {}", path, e));
                 return None;
             }
         };

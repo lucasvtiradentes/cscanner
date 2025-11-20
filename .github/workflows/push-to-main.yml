@@ -149,7 +149,7 @@ jobs:
         if: needs.push_to_main_ci.outputs.should_release == 'true'
         run: |
           echo "📦 Generating scoped @tscanner packages..."
-          node packages/cli/scripts/generate-packages.mjs
+          pnpm --filter tscanner run script:fix-packages 
           echo "✅ Scoped packages generated"
 
       - name: Create Release Pull Request or Publish

@@ -2,7 +2,6 @@ use notify::{Event, EventKind, RecursiveMode, Watcher};
 use std::path::{Path, PathBuf};
 use std::sync::mpsc::{channel, Receiver, Sender};
 use std::time::Duration;
-use tracing::{debug, error};
 
 #[derive(Debug, Clone)]
 pub enum FileEvent {
@@ -24,10 +23,10 @@ impl FileWatcher {
             notify::recommended_watcher(move |res: Result<Event, notify::Error>| match res {
                 Ok(event) => {
                     if let Err(e) = Self::handle_event(event, &tx) {
-                        error!("Error handling file event: {}", e);
+                        crate::log_error(&format!("Error handling file event: {}", e));
                     }
                 }
-                Err(e) => error!("Watch error: {:?}", e),
+                Err(e) => crate::log_error(&format!("Watch error: {:?}", e)),
             })?;
 
         watcher.watch(root, RecursiveMode::Recursive)?;
@@ -54,7 +53,7 @@ impl FileWatcher {
                 _ => continue,
             };
 
-            debug!("File event: {:?}", file_event);
+            crate::log_debug(&format!("File event: {:?}", file_event));
             tx.send(file_event)?;
         }
 

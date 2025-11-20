@@ -1,10 +1,9 @@
 use crate::protocol::{Response, WatchParams};
 use crate::state::ServerState;
 use core::FileWatcher;
-use tracing::info;
 
 pub fn handle_watch(request_id: u64, params: WatchParams, state: &mut ServerState) -> Response {
-    info!("Starting file watcher: {:?}", params.root);
+    core::log_info(&format!("Starting file watcher: {:?}", params.root));
 
     match FileWatcher::new(&params.root) {
         Ok(watcher) => {

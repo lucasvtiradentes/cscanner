@@ -4,7 +4,6 @@ use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::time::SystemTime;
-use tracing::info;
 
 #[derive(Clone, Serialize, Deserialize)]
 struct CacheEntry {
@@ -95,11 +94,11 @@ impl FileCache {
                             loaded += 1;
                         }
                     }
-                    info!("Loaded {} cache entries", loaded);
+                    crate::log_debug(&format!("Loaded {} cache entries", loaded));
                 }
-                Err(e) => info!("Failed to parse cache: {}", e),
+                Err(e) => crate::log_debug(&format!("Failed to parse cache: {}", e)),
             },
-            Err(e) => info!("Failed to read cache: {}", e),
+            Err(e) => crate::log_debug(&format!("Failed to read cache: {}", e)),
         }
     }
 
@@ -115,9 +114,9 @@ impl FileCache {
 
             if let Ok(content) = serde_json::to_string(&entries) {
                 if let Err(e) = fs::write(&cache_file, &content) {
-                    info!("Failed to save cache: {}", e);
+                    crate::log_debug(&format!("Failed to save cache: {}", e));
                 } else {
-                    info!("Saved {} cache entries", entries.len());
+                    crate::log_debug(&format!("Saved {} cache entries", entries.len()));
                 }
             }
         }

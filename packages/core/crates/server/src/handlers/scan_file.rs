@@ -1,14 +1,13 @@
 use crate::protocol::{Response, ScanFileParams};
 use crate::state::ServerState;
 use core::{Scanner, TscannerConfig};
-use tracing::info;
 
 pub fn handle_scan_file(
     request_id: u64,
     params: ScanFileParams,
     state: &mut ServerState,
 ) -> Response {
-    info!("Scanning single file: {:?}", params.file);
+    core::log_debug(&format!("Scanning single file: {:?}", params.file));
 
     let config = TscannerConfig::load_from_workspace(&params.root).unwrap_or_default();
 

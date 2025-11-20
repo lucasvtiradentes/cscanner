@@ -1,26 +1,25 @@
 use crate::protocol::{Response, ScanContentParams};
 use crate::state::ServerState;
 use core::{Scanner, TscannerConfig};
-use tracing::info;
 
 pub fn handle_scan_content(
     request_id: u64,
     params: ScanContentParams,
     state: &mut ServerState,
 ) -> Response {
-    info!("Scanning content for file: {:?}", params.file);
+    core::log_debug(&format!("Scanning content for file: {:?}", params.file));
 
     let config = if let Some(cfg) = params.config {
-        info!("Using config from request params (global storage)");
+        core::log_debug("Using config from request params (global storage)");
         cfg
     } else {
         match TscannerConfig::load_from_workspace(&params.root) {
             Ok(c) => {
-                info!("Loaded configuration from workspace (.tscanner/rules.json)");
+                core::log_debug("Loaded configuration from workspace (.tscanner/rules.json)");
                 c
             }
             Err(e) => {
-                info!("Using default configuration: {}", e);
+                core::log_debug(&format!("Using default configuration: {}", e));
                 TscannerConfig::default()
             }
         }
