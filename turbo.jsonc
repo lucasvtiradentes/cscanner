@@ -28,7 +28,7 @@
         "package.json"
       ]
     },
-    "build:rust": {
+    "core#build": {
       "outputLogs": "new-only",
       "outputs": [
         "target/release/cscanner",
@@ -41,12 +41,6 @@
         "crates/**",
         "Cargo.toml",
         "Cargo.lock"
-      ]
-    },
-    "core#build": {
-      "outputLogs": "new-only",
-      "outputs": [
-        "target/release/**"
       ]
     },
     "cscanner#build": {

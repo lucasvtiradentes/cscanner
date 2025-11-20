@@ -14,12 +14,6 @@ cp target/release/cscanner /usr/local/bin/
 
 ### Cross-Platform Binaries
 
-Pre-built binaries are available in the `binaries/` folder after running:
-
-```bash
-pnpm run build:rust:all
-```
-
 Available platforms:
 - `cscanner-x86_64-unknown-linux-gnu` (Linux x86_64)
 - `cscanner-aarch64-unknown-linux-gnu` (Linux ARM64)

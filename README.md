@@ -155,9 +155,6 @@ VSCode extension for editor integration with real-time feedback.
 ```bash
 pnpm dev                        # Watch mode: Extension + Rust auto-rebuild
 pnpm run build                  # Build extension (bundles Rust binary)
-./scripts/build-all.sh          # Build Rust workspace + extension
-./scripts/build-binaries.sh     # Cross-compile for all platforms
-./scripts/clean-install.sh      # Clean reinstall (clears cache)
 ```
 
 ### Development Workflow
@@ -177,10 +174,6 @@ pnpm dev
 Press `F5` to launch Extension Development Host
 
 ### Cross-Platform Binaries
-
-```bash
-./scripts/build-binaries.sh
-```
 
 Targets:
 - `x86_64-unknown-linux-gnu`

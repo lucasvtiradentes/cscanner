@@ -148,7 +148,7 @@ packages/cli/
 │   └── win32-x64/
 │       └── cscanner.exe
 ├── scripts/
-│   └── copy-binaries.sh     # Copies Rust binaries to npm/
+│   └── copy-binaries.ts     # Copies Rust binaries to npm/
 ├── package.json
 ├── tsconfig.json
 └── biome.json
@@ -180,12 +180,6 @@ pnpm run dev                 # Watch mode for TypeScript
 ```bash
 cd ../core
 cargo build --release --bin cscanner
-```
-
-Or build for all platforms:
-```bash
-cd ../..
-pnpm run build:rust:all
 ```
 
 **2. Compile TypeScript + copy binaries:**
@@ -266,12 +260,6 @@ Select packages to version:
 - `cscanner` (main package)
 - Platform packages (all 5)
 
-**2. Build Rust binaries (all platforms):**
-```bash
-cd packages/core
-./scripts/build-binaries.sh
-```
-
 **3. Copy binaries to npm packages:**
 ```bash
 cd ../cli
@@ -313,9 +301,6 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install
-
-      - name: Build Rust binaries
-        run: pnpm run build:rust:all
 
       - name: Build TypeScript + copy binaries
         run: |

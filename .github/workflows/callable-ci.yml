@@ -150,7 +150,7 @@ jobs:
       - uses: ./.github/actions/setup-and-install
 
       - name: Build release
-        run: pnpm turbo run build:rust --filter=core
+        run: pnpm turbo run build --filter=core
 
   build:
     if: inputs.run_build
