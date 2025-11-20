@@ -210,7 +210,7 @@ Config: /home/user/project/.tscanner/rules.json
 ## Environment Variables
 
 ```bash
-RUST_LOG=core=debug,tscanner_cli=debug tscanner check
+RUST_LOG=core=debug,cli=debug tscanner check
 ```
 
 Log levels: `error`, `warn`, `info`, `debug`, `trace`

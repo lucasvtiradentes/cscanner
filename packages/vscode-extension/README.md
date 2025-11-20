@@ -314,7 +314,7 @@ export class RustClient {
   async start(): Promise<void> {
     this.process = spawn(binaryPath, [], {
       stdio: ['pipe', 'pipe', 'pipe'],
-      env: { RUST_LOG: 'core=warn,tscanner_server=info' }
+      env: { RUST_LOG: 'core=warn,server=info' }
     });
 
     // Handle stdout (JSON-RPC responses)

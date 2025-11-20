@@ -2,8 +2,8 @@
 resolver = "2"
 members = [
   "crates/core",
-  "crates/tscanner_cli",
-  "crates/tscanner_server",
+  "crates/cli",
+  "crates/server",
 ]
 
 [workspace.package]

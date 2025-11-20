@@ -9,9 +9,12 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
+mod constants;
+use constants::*;
+
 #[derive(Parser)]
-#[command(name = "tscanner")]
-#[command(version, about = "High-performance TypeScript/TSX code quality scanner", long_about = None)]
+#[command(name = APP_NAME)]
+#[command(version, about = APP_DESCRIPTION, long_about = None)]
 struct Cli {
     #[command(subcommand)]
     command: Commands,
@@ -61,12 +64,23 @@ fn cmd_check(path: &Path, no_cache: bool) -> Result<()> {
     let config = match load_config(&root)? {
         Some(cfg) => cfg,
         None => {
-            eprintln!("{}", "Error: No tscanner configuration found!".red().bold());
+            eprintln!(
+                "{}",
+                format!("Error: No {} configuration found!", APP_NAME)
+                    .red()
+                    .bold()
+            );
             eprintln!();
             eprintln!("Searched for config in:");
             eprintln!(
                 "  • {}",
-                format!("{}/.tscanner/rules.json", root.display()).yellow()
+                format!(
+                    "{}/{}/{}",
+                    root.display(),
+                    CONFIG_DIR_NAME,
+                    CONFIG_FILE_NAME
+                )
+                .yellow()
             );
 
             if let Some(global_path) = get_vscode_global_config_path(&root) {
@@ -76,7 +90,7 @@ fn cmd_check(path: &Path, no_cache: bool) -> Result<()> {
             eprintln!();
             eprintln!(
                 "Run {} to create a default configuration.",
-                "tscanner init".cyan()
+                format!("{} init", APP_NAME).cyan()
             );
             std::process::exit(1);
         }
@@ -171,17 +185,27 @@ fn cmd_rules(path: &Path) -> Result<()> {
     let (config, config_path) = match load_config_with_path(&root)? {
         Some((cfg, path)) => (cfg, path),
         None => {
-            eprintln!("{}", "Error: No tscanner configuration found!".red().bold());
+            eprintln!(
+                "{}",
+                format!("Error: No {} configuration found!", APP_NAME)
+                    .red()
+                    .bold()
+            );
             eprintln!();
             eprintln!(
                 "Run {} to create a default configuration.",
-                "tscanner init".cyan()
+                format!("{} init", APP_NAME).cyan()
             );
             std::process::exit(1);
         }
     };
 
-    println!("{}", "tscanner Rules Configuration".cyan().bold());
+    println!(
+        "{}",
+        format!("{} Rules Configuration", APP_DISPLAY_NAME)
+            .cyan()
+            .bold()
+    );
     println!("Config: {}\n", config_path.dimmed());
 
     let mut enabled_rules: Vec<_> = config.rules.iter().filter(|(_, cfg)| cfg.enabled).collect();
@@ -229,8 +253,8 @@ fn cmd_rules(path: &Path) -> Result<()> {
 
 fn cmd_init(path: &Path) -> Result<()> {
     let root = fs::canonicalize(path).context("Failed to resolve path")?;
-    let config_dir = root.join(".tscanner");
-    let config_path = config_dir.join("rules.json");
+    let config_dir = root.join(CONFIG_DIR_NAME);
+    let config_path = config_dir.join(CONFIG_FILE_NAME);
 
     if config_path.exists() {
         eprintln!("{}", "Error: Configuration already exists!".red().bold());
@@ -239,7 +263,8 @@ fn cmd_init(path: &Path) -> Result<()> {
     }
 
     let default_config = TscannerConfig::default();
-    fs::create_dir_all(&config_dir).context("Failed to create .tscanner directory")?;
+    fs::create_dir_all(&config_dir)
+        .context(format!("Failed to create {} directory", CONFIG_DIR_NAME))?;
 
     let config_json = serde_json::to_string_pretty(&default_config)?;
     fs::write(&config_path, config_json).context("Failed to write config file")?;
@@ -257,7 +282,7 @@ fn load_config(root: &Path) -> Result<Option<TscannerConfig>> {
 }
 
 fn load_config_with_path(root: &Path) -> Result<Option<(TscannerConfig, String)>> {
-    let local_path = root.join(".tscanner").join("rules.json");
+    let local_path = root.join(CONFIG_DIR_NAME).join(CONFIG_FILE_NAME);
     if local_path.exists() {
         let config =
             TscannerConfig::load_from_file(&local_path).map_err(|e| anyhow::anyhow!("{}", e))?;
@@ -279,15 +304,26 @@ fn get_vscode_global_config_path(root: &Path) -> Option<PathBuf> {
     let home = dirs::home_dir()?;
     let workspace_hash = compute_workspace_hash(root);
 
-    Some(
-        home.join(".config")
+    let vscode_dir = if cfg!(target_os = "windows") {
+        home.join("AppData").join("Roaming").join("Code")
+    } else if cfg!(target_os = "macos") {
+        home.join("Library")
+            .join("Application Support")
             .join("Code")
+    } else {
+        home.join(".config").join("Code")
+    };
+
+    let extension_id = get_vscode_extension_id();
+
+    Some(
+        vscode_dir
             .join("User")
             .join("globalStorage")
-            .join("lucasvtiradentes.tscanner-vscode-dev")
+            .join(extension_id)
             .join("configs")
             .join(workspace_hash)
-            .join("rules.json"),
+            .join(CONFIG_FILE_NAME),
     )
 }
 

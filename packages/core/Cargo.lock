@@ -227,6 +227,24 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a1d728cc89cf3aee9ff92b05e62b19ee65a02b5702cff7d5a377e32c6ae29d8d"
 
 [[package]]
+name = "cli"
+version = "1.0.0"
+dependencies = [
+ "anyhow",
+ "clap",
+ "colored",
+ "core",
+ "dirs",
+ "md5",
+ "pathdiff",
+ "serde",
+ "serde_json",
+ "tracing",
+ "tracing-subscriber",
+ "walkdir",
+]
+
+[[package]]
 name = "colorchoice"
 version = "1.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1125,6 +1143,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "server"
+version = "1.0.0"
+dependencies = [
+ "anyhow",
+ "base64",
+ "core",
+ "flate2",
+ "serde",
+ "serde_json",
+ "time",
+ "tracing",
+ "tracing-subscriber",
+]
+
+[[package]]
 name = "sharded-slab"
 version = "0.1.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1508,39 +1541,6 @@ checksum = "dd69c5aa8f924c7519d6372789a74eac5b94fb0f8fcf0d4a97eb0bfc3e785f39"
 dependencies = [
  "serde",
  "stable_deref_trait",
-]
-
-[[package]]
-name = "tscanner_cli"
-version = "1.0.0"
-dependencies = [
- "anyhow",
- "clap",
- "colored",
- "core",
- "dirs",
- "md5",
- "pathdiff",
- "serde",
- "serde_json",
- "tracing",
- "tracing-subscriber",
- "walkdir",
-]
-
-[[package]]
-name = "tscanner_server"
-version = "1.0.0"
-dependencies = [
- "anyhow",
- "base64",
- "core",
- "flate2",
- "serde",
- "serde_json",
- "time",
- "tracing",
- "tracing-subscriber",
 ]
 
 [[package]]

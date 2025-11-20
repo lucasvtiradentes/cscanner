@@ -51,19 +51,19 @@ core/
     └── ... (20 more rules)
 ```
 
-### tscanner_server (Binary)
+### server (Binary)
 
 JSON-RPC server for VSCode extension communication.
 
 **Binary name:** `tscanner-server`
-**Location:** `crates/tscanner_server/`
+**Location:** `crates/server/`
 
-### tscanner_cli (Binary - Stub)
+### cli (Binary - Stub)
 
 Planned standalone CLI tool (currently stub).
 
 **Binary name:** `tscanner`
-**Location:** `crates/tscanner_cli/`
+**Location:** `crates/cli/`
 
 ## 🏗️ Architecture<a href="#TOC"><img align="right" src="https://raw.githubusercontent.com/lucasvtiradentes/tscanner/main/.github/image/up_arrow.png" width="22"></a>
 

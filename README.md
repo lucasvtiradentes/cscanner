@@ -137,8 +137,8 @@ cargo watch -x build
 Rust workspace with three crates:
 
 - **`core`** - Core library (Scanner, Parser, Rules, Cache, Config)
-- **`tscanner_server`** - JSON-RPC server binary (main entry point for VSCode)
-- **`tscanner_cli`** - CLI binary (planned, currently stub)
+- **`server`** - JSON-RPC server binary (main entry point for VSCode)
+- **`cli`** - CLI binary (planned, currently stub)
 
 [Detailed Documentation →](packages/core/README.md)
 
