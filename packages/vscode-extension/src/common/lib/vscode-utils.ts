@@ -131,3 +131,11 @@ export function showToastMessage(kind: ToastKind, message: string, ...items: str
 export function openTextDocument(uri: vscode.Uri): Thenable<vscode.TextDocument> {
   return vscode.workspace.openTextDocument(uri);
 }
+
+export function getWorkspaceFolders(): readonly vscode.WorkspaceFolder[] | undefined {
+  return vscode.workspace.workspaceFolders;
+}
+
+export function getCurrentWorkspaceFolder(): vscode.WorkspaceFolder | undefined {
+  return vscode.workspace.workspaceFolders?.[0];
+}

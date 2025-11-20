@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { getCommandId, getStatusBarName } from '../common/constants';
 import { loadEffectiveConfig } from '../common/lib/config-manager';
+import { getCurrentWorkspaceFolder } from '../common/lib/vscode-utils';
 
 export class StatusBarManager {
   private statusBarItem: vscode.StatusBarItem;
@@ -15,7 +16,7 @@ export class StatusBarManager {
   }
 
   async update(): Promise<void> {
-    const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+    const workspaceFolder = getCurrentWorkspaceFolder();
 
     if (!workspaceFolder) {
       this.statusBarItem.hide();

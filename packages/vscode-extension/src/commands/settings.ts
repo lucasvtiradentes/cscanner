@@ -3,6 +3,7 @@ import { getGlobalConfigPath, getLocalConfigPath } from '../common/lib/config-ma
 import {
   Command,
   executeCommand,
+  getCurrentWorkspaceFolder,
   openTextDocument,
   registerCommand,
   showToastMessage,
@@ -62,7 +63,7 @@ export function createOpenSettingsMenuCommand(
 }
 
 async function openProjectCscannerConfigs(context: vscode.ExtensionContext) {
-  const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+  const workspaceFolder = getCurrentWorkspaceFolder();
 
   if (!workspaceFolder) {
     showToastMessage(ToastKind.Error, 'No workspace folder open');
@@ -127,7 +128,7 @@ async function showScanSettingsMenu(
     updateStatusBar();
     executeCommand(Command.FindIssue);
   } else if (selected.label.includes('Branch')) {
-    const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+    const workspaceFolder = getCurrentWorkspaceFolder();
     if (!workspaceFolder) {
       showToastMessage(ToastKind.Error, 'No workspace folder open');
       return;

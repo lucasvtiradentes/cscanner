@@ -5,6 +5,7 @@ import {
   Command,
   ContextKey,
   executeCommand,
+  getCurrentWorkspaceFolder,
   registerCommand,
   setContextKey,
   setWorkspaceState,
@@ -36,7 +37,7 @@ export function createFindIssueCommand(
       return;
     }
 
-    const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+    const workspaceFolder = getCurrentWorkspaceFolder();
     if (!workspaceFolder) {
       if (!options?.silent) {
         showToastMessage(ToastKind.Error, 'No workspace folder open');

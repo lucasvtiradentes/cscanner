@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { GroupMode, IssueResult, ViewMode } from '../common/types';
+import { getCurrentWorkspaceFolder } from '../common/lib/vscode-utils';
 import { buildFolderTree } from './tree-builder';
 import { FileResultItem, FolderResultItem, LineResultItem, RuleGroupItem } from './tree-items';
 
@@ -61,7 +62,7 @@ export class SearchResultProvider implements vscode.TreeDataProvider<SearchResul
       return [];
     }
 
-    const workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || '';
+    const workspaceRoot = getCurrentWorkspaceFolder()?.uri.fsPath || '';
     const tree = buildFolderTree(this.results, workspaceRoot);
     const folders: FolderResultItem[] = [];
 
@@ -105,7 +106,7 @@ export class SearchResultProvider implements vscode.TreeDataProvider<SearchResul
           Array.from(grouped.entries()).map(([path, results]) => new FileResultItem(path, results)),
         );
       } else {
-        const workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || '';
+        const workspaceRoot = getCurrentWorkspaceFolder()?.uri.fsPath || '';
         const tree = buildFolderTree(this.results, workspaceRoot);
 
         const items: SearchResultItem[] = [];
@@ -122,7 +123,7 @@ export class SearchResultProvider implements vscode.TreeDataProvider<SearchResul
       if (element.viewMode === 'list') {
         return Promise.resolve(element.results.map((r) => new LineResultItem(r)));
       } else {
-        const workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || '';
+        const workspaceRoot = getCurrentWorkspaceFolder()?.uri.fsPath || '';
         const tree = buildFolderTree(element.results, workspaceRoot);
 
         const items: SearchResultItem[] = [];

@@ -7,6 +7,7 @@ import {
   Command,
   ContextKey,
   executeCommand,
+  getCurrentWorkspaceFolder,
   getWorkspaceState,
   openTextDocument,
   setContextKey,
@@ -21,7 +22,7 @@ import { StatusBarManager } from './status-bar/status-bar-manager';
 let activationKey: string | undefined;
 
 export function activate(context: vscode.ExtensionContext) {
-  const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+  const workspaceFolder = getCurrentWorkspaceFolder();
   const currentKey = workspaceFolder?.uri.fsPath || 'no-workspace';
 
   if (activationKey === currentKey) {
@@ -92,7 +93,7 @@ export function activate(context: vscode.ExtensionContext) {
   const updateSingleFile = async (uri: vscode.Uri) => {
     if (isSearchingRef.current) return;
 
-    const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+    const workspaceFolder = getCurrentWorkspaceFolder();
     if (!workspaceFolder) return;
 
     const relativePath = vscode.workspace.asRelativePath(uri);

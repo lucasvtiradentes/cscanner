@@ -6,7 +6,7 @@ import { IssueResult } from '../types';
 import { getExtensionPath } from '../utils/extension-helper';
 import { LOG_FILE_PATH, logger } from '../utils/logger';
 import { RustClient } from './rust-client';
-import { openTextDocument } from './vscode-utils';
+import { getCurrentWorkspaceFolder, openTextDocument } from './vscode-utils';
 
 let rustClient: RustClient | null = null;
 
@@ -50,7 +50,7 @@ export function getRustBinaryPath(): string | null {
 }
 
 export async function scanWorkspace(fileFilter?: Set<string>, config?: any): Promise<IssueResult[]> {
-  const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+  const workspaceFolder = getCurrentWorkspaceFolder();
   if (!workspaceFolder) {
     return [];
   }
@@ -104,7 +104,7 @@ export async function scanWorkspace(fileFilter?: Set<string>, config?: any): Pro
 }
 
 export async function scanFile(filePath: string): Promise<IssueResult[]> {
-  const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+  const workspaceFolder = getCurrentWorkspaceFolder();
   if (!workspaceFolder) {
     return [];
   }
@@ -130,7 +130,7 @@ export async function scanFile(filePath: string): Promise<IssueResult[]> {
 }
 
 export async function scanContent(filePath: string, content: string, config?: any): Promise<IssueResult[]> {
-  const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+  const workspaceFolder = getCurrentWorkspaceFolder();
   if (!workspaceFolder) {
     return [];
   }

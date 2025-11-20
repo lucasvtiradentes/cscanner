@@ -1,6 +1,13 @@
 import * as vscode from 'vscode';
 import { clearCache } from '../common/lib/scanner';
-import { Command, executeCommand, registerCommand, showToastMessage, ToastKind } from '../common/lib/vscode-utils';
+import {
+  Command,
+  executeCommand,
+  getCurrentWorkspaceFolder,
+  registerCommand,
+  showToastMessage,
+  ToastKind,
+} from '../common/lib/vscode-utils';
 import { invalidateCache } from '../common/utils/git-helper';
 import { logger } from '../common/utils/logger';
 
@@ -17,7 +24,7 @@ export function createHardScanCommand(isSearchingRef: { current: boolean }) {
       return;
     }
 
-    const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+    const workspaceFolder = getCurrentWorkspaceFolder();
     if (!workspaceFolder) {
       showToastMessage(ToastKind.Error, 'No workspace folder open');
       return;

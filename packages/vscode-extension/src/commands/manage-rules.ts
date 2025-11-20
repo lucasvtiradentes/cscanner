@@ -10,7 +10,14 @@ import {
 } from '../common/lib/config-manager';
 import { RustClient } from '../common/lib/rust-client';
 import { getRustBinaryPath } from '../common/lib/scanner';
-import { Command, executeCommand, registerCommand, showToastMessage, ToastKind } from '../common/lib/vscode-utils';
+import {
+  Command,
+  executeCommand,
+  getCurrentWorkspaceFolder,
+  registerCommand,
+  showToastMessage,
+  ToastKind,
+} from '../common/lib/vscode-utils';
 import { logger } from '../common/utils/logger';
 
 interface RuleQuickPickItem extends vscode.QuickPickItem {
@@ -34,7 +41,7 @@ function getCategoryIcon(category: string): string {
 
 export function createManageRulesCommand(updateStatusBar: () => Promise<void>, context: vscode.ExtensionContext) {
   return registerCommand(Command.ManageRules, async () => {
-    const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+    const workspaceFolder = getCurrentWorkspaceFolder();
     if (!workspaceFolder) {
       showToastMessage(ToastKind.Error, 'No workspace folder open');
       return;
