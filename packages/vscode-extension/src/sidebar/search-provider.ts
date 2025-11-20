@@ -1,13 +1,13 @@
 import * as vscode from 'vscode';
-import { getCurrentWorkspaceFolder } from '../common/lib/vscode-utils';
-import { GroupMode, IssueResult, ViewMode } from '../common/types';
+import { GroupMode, ViewMode, getCurrentWorkspaceFolder } from '../common/lib/vscode-utils';
+import { IssueResult } from '../common/types';
 import { buildFolderTree } from './tree-builder';
 import { FileResultItem, FolderResultItem, LineResultItem, RuleGroupItem } from './tree-items';
 
 export class SearchResultProvider implements vscode.TreeDataProvider<SearchResultItem> {
   private results: IssueResult[] = [];
-  private _viewMode: ViewMode = 'list';
-  private _groupMode: GroupMode = 'default';
+  private _viewMode: ViewMode = ViewMode.List;
+  private _groupMode: GroupMode = GroupMode.Default;
 
   private _onDidChangeTreeData = new vscode.EventEmitter<SearchResultItem | undefined | void>();
   readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
@@ -58,7 +58,7 @@ export class SearchResultProvider implements vscode.TreeDataProvider<SearchResul
   }
 
   getAllFolderItems(): FolderResultItem[] {
-    if (this._viewMode !== 'tree') {
+    if (this._viewMode !== ViewMode.Tree) {
       return [];
     }
 

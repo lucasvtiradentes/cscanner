@@ -1,14 +1,14 @@
 import * as vscode from 'vscode';
 import { getCommandId, getStatusBarName } from '../common/constants';
 import { loadEffectiveConfig } from '../common/lib/config-manager';
-import { getCurrentWorkspaceFolder } from '../common/lib/vscode-utils';
+import { ScanMode, getCurrentWorkspaceFolder } from '../common/lib/vscode-utils';
 
 export class StatusBarManager {
   private statusBarItem: vscode.StatusBarItem;
 
   constructor(
     private context: vscode.ExtensionContext,
-    private currentScanModeRef: { current: 'workspace' | 'branch' },
+    private currentScanModeRef: { current: ScanMode },
     private currentCompareBranchRef: { current: string },
   ) {
     this.statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
@@ -28,8 +28,9 @@ export class StatusBarManager {
     hasConfig = config !== null && Object.keys(config.rules).length > 0;
 
     const icon = hasConfig ? '$(gear)' : '$(warning)';
-    const modeText = this.currentScanModeRef.current === 'workspace' ? 'Codebase' : 'Branch';
-    const branchText = this.currentScanModeRef.current === 'branch' ? ` (${this.currentCompareBranchRef.current})` : '';
+    const modeText = this.currentScanModeRef.current === ScanMode.Workspace ? 'Codebase' : 'Branch';
+    const branchText =
+      this.currentScanModeRef.current === ScanMode.Branch ? ` (${this.currentCompareBranchRef.current})` : '';
     const configWarning = hasConfig ? '' : ' [No rules configured]';
 
     this.statusBarItem.text = `${icon} ${getStatusBarName()}: ${modeText}${branchText}${configWarning}`;

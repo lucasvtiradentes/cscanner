@@ -59,6 +59,3 @@ export interface FileNode {
   name: string;
   results: IssueResult[];
 }
-
-export type ViewMode = 'list' | 'tree';
-export type GroupMode = 'default' | 'rule';

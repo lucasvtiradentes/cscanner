@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import { getGlobalConfigPath, getLocalConfigPath } from '../common/lib/config-manager';
 import {
   Command,
+  ScanMode,
   ToastKind,
   WorkspaceStateKey,
   executeCommand,
@@ -17,7 +18,7 @@ import { SearchResultProvider } from '../sidebar/search-provider';
 
 export function createOpenSettingsMenuCommand(
   updateStatusBar: () => Promise<void>,
-  currentScanModeRef: { current: 'workspace' | 'branch' },
+  currentScanModeRef: { current: ScanMode },
   currentCompareBranchRef: { current: string },
   context: vscode.ExtensionContext,
   searchProvider: SearchResultProvider,
@@ -96,7 +97,7 @@ async function openProjectCscannerConfigs(context: vscode.ExtensionContext) {
 
 async function showScanSettingsMenu(
   updateStatusBar: () => Promise<void>,
-  currentScanModeRef: { current: 'workspace' | 'branch' },
+  currentScanModeRef: { current: ScanMode },
   currentCompareBranchRef: { current: string },
   context: vscode.ExtensionContext,
   searchProvider: SearchResultProvider,
@@ -104,12 +105,12 @@ async function showScanSettingsMenu(
   const scanModeItems: vscode.QuickPickItem[] = [
     {
       label: '$(file-directory) Codebase',
-      description: currentScanModeRef.current === 'workspace' ? '✓ Active' : '',
+      description: currentScanModeRef.current === ScanMode.Workspace ? '✓ Active' : '',
       detail: 'Scan all files in workspace',
     },
     {
       label: '$(git-branch) Branch',
-      description: currentScanModeRef.current === 'branch' ? '✓ Active' : '',
+      description: currentScanModeRef.current === ScanMode.Branch ? '✓ Active' : '',
       detail: 'Scan only changed files in current branch',
     },
   ];
@@ -123,12 +124,12 @@ async function showScanSettingsMenu(
 
   if (selected.label.includes('Codebase')) {
     searchProvider.setResults([]);
-    currentScanModeRef.current = 'workspace';
-    updateState(context, WorkspaceStateKey.ScanMode, 'workspace');
+    currentScanModeRef.current = ScanMode.Workspace;
+    updateState(context, WorkspaceStateKey.ScanMode, ScanMode.Workspace);
     invalidateCache();
     updateStatusBar();
     executeCommand(Command.FindIssue);
-  } else if (selected.label.includes('Branch')) {
+  } else if (selected.label.includes(ScanMode.Branch)) {
     const workspaceFolder = getCurrentWorkspaceFolder();
     if (!workspaceFolder) {
       showToastMessage(ToastKind.Error, 'No workspace folder open');
@@ -211,8 +212,8 @@ async function showScanSettingsMenu(
     }
 
     searchProvider.setResults([]);
-    currentScanModeRef.current = 'branch';
-    updateState(context, WorkspaceStateKey.ScanMode, 'branch');
+    currentScanModeRef.current = ScanMode.Branch;
+    updateState(context, WorkspaceStateKey.ScanMode, ScanMode.Branch);
     invalidateCache();
     updateStatusBar();
     executeCommand(Command.FindIssue);

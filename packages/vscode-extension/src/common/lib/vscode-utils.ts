@@ -2,6 +2,21 @@ import * as vscode from 'vscode';
 import { z } from 'zod';
 import { getCommandId, getContextKey } from '../constants';
 
+export enum ViewMode {
+  List = 'list',
+  Tree = 'tree',
+}
+
+export enum GroupMode {
+  Default = 'default',
+  Rule = 'rule',
+}
+
+export enum ScanMode {
+  Workspace = 'workspace',
+  Branch = 'branch',
+}
+
 export enum WorkspaceStateKey {
   ViewMode = 'viewMode',
   GroupMode = 'groupMode',
@@ -11,9 +26,9 @@ export enum WorkspaceStateKey {
 }
 
 const workspaceStateSchema = z.object({
-  [WorkspaceStateKey.ViewMode]: z.enum(['list', 'tree']),
-  [WorkspaceStateKey.GroupMode]: z.enum(['default', 'rule']),
-  [WorkspaceStateKey.ScanMode]: z.enum(['workspace', 'branch']),
+  [WorkspaceStateKey.ViewMode]: z.enum(ViewMode),
+  [WorkspaceStateKey.GroupMode]: z.enum(GroupMode),
+  [WorkspaceStateKey.ScanMode]: z.enum(ScanMode),
   [WorkspaceStateKey.CompareBranch]: z.string(),
   [WorkspaceStateKey.CachedResults]: z.array(z.any()),
 });
@@ -22,9 +37,9 @@ type WorkspaceStateSchema = z.infer<typeof workspaceStateSchema>;
 type WorkspaceStateKeyType = keyof WorkspaceStateSchema;
 
 const defaultValues: WorkspaceStateSchema = {
-  [WorkspaceStateKey.ViewMode]: 'list',
-  [WorkspaceStateKey.GroupMode]: 'default',
-  [WorkspaceStateKey.ScanMode]: 'workspace',
+  [WorkspaceStateKey.ViewMode]: ViewMode.List,
+  [WorkspaceStateKey.GroupMode]: GroupMode.Default,
+  [WorkspaceStateKey.ScanMode]: ScanMode.Workspace,
   [WorkspaceStateKey.CompareBranch]: 'main',
   [WorkspaceStateKey.CachedResults]: [],
 };
