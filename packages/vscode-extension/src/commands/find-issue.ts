@@ -8,6 +8,8 @@ import {
   registerCommand,
   setContextKey,
   setWorkspaceState,
+  showToastMessage,
+  ToastKind,
   updateState,
 } from '../common/lib/vscode-utils';
 import { branchExists, getChangedFiles, getModifiedLineRanges } from '../common/utils/git-helper';
@@ -29,7 +31,7 @@ export function createFindIssueCommand(
   return registerCommand(Command.FindIssue, async (options?: { silent?: boolean }) => {
     if (isSearchingRef.current) {
       if (!options?.silent) {
-        vscode.window.showWarningMessage('Search already in progress');
+        showToastMessage(ToastKind.Warning, 'Search already in progress');
       }
       return;
     }
@@ -37,7 +39,7 @@ export function createFindIssueCommand(
     const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
     if (!workspaceFolder) {
       if (!options?.silent) {
-        vscode.window.showErrorMessage('No workspace folder open');
+        showToastMessage(ToastKind.Error, 'No workspace folder open');
       }
       return;
     }
@@ -47,7 +49,8 @@ export function createFindIssueCommand(
 
     if (!effectiveConfig || Object.keys(effectiveConfig.rules).length === 0) {
       if (!options?.silent) {
-        const action = await vscode.window.showWarningMessage(
+        const action = await showToastMessage(
+          ToastKind.Warning,
           'No rules configured for this workspace',
           'Configure Rules',
         );
@@ -68,7 +71,8 @@ export function createFindIssueCommand(
     if (currentScanModeRef.current === 'branch') {
       const branchExistsCheck = await branchExists(workspaceFolder.uri.fsPath, currentCompareBranchRef.current);
       if (!branchExistsCheck) {
-        const action = await vscode.window.showErrorMessage(
+        const action = await showToastMessage(
+          ToastKind.Error,
           `Branch '${currentCompareBranchRef.current}' does not exist in this repository`,
           'Change Branch',
           'Switch to Workspace Mode',
@@ -196,9 +200,9 @@ export function createFindIssueCommand(
           }
 
           if (results.length === 0) {
-            vscode.window.showInformationMessage('No issues found!');
+            showToastMessage(ToastKind.Info, 'No issues found!');
           } else {
-            vscode.window.showInformationMessage(`Found ${results.length} issue${results.length === 1 ? '' : 's'}`);
+            showToastMessage(ToastKind.Info, `Found ${results.length} issue${results.length === 1 ? '' : 's'}`);
           }
         },
       );

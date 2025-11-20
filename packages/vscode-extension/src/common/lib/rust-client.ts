@@ -3,6 +3,7 @@ import * as zlib from 'zlib';
 import * as vscode from 'vscode';
 import { FileResult, IssueResult, RuleMetadata, ScanResult } from '../types';
 import { logger } from '../utils/logger';
+import { openTextDocument } from './vscode-utils';
 
 interface RpcRequest {
   id: number;
@@ -171,7 +172,7 @@ export class RustClient {
 
         if (!lineText && fileFilter && fileFilter.has(vscode.workspace.asRelativePath(uri))) {
           try {
-            const document = await vscode.workspace.openTextDocument(uri);
+            const document = await openTextDocument(uri);
             lineText = document.lineAt(issue.line - 1).text;
           } catch (error) {
             logger.error(`Failed to load line text for: ${fileResult.file}`);

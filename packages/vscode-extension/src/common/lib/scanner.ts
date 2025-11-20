@@ -6,6 +6,7 @@ import { IssueResult } from '../types';
 import { getExtensionPath } from '../utils/extension-helper';
 import { LOG_FILE_PATH, logger } from '../utils/logger';
 import { RustClient } from './rust-client';
+import { openTextDocument } from './vscode-utils';
 
 let rustClient: RustClient | null = null;
 
@@ -66,7 +67,7 @@ export async function scanWorkspace(fileFilter?: Set<string>, config?: any): Pro
       )
       .then((selection) => {
         if (selection === 'Open Logs') {
-          vscode.workspace.openTextDocument(LOG_FILE_PATH).then((doc) => {
+          openTextDocument(vscode.Uri.file(LOG_FILE_PATH)).then((doc) => {
             vscode.window.showTextDocument(doc);
           });
         }
@@ -93,7 +94,7 @@ export async function scanWorkspace(fileFilter?: Set<string>, config?: any): Pro
       .showErrorMessage(`Cscanner: Rust backend error: ${error}\n\nCheck logs at ${LOG_FILE_PATH}`, 'Open Logs')
       .then((selection) => {
         if (selection === 'Open Logs') {
-          vscode.workspace.openTextDocument(LOG_FILE_PATH).then((doc) => {
+          openTextDocument(vscode.Uri.file(LOG_FILE_PATH)).then((doc) => {
             vscode.window.showTextDocument(doc);
           });
         }

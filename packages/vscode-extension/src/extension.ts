@@ -8,6 +8,7 @@ import {
   ContextKey,
   executeCommand,
   getWorkspaceState,
+  openTextDocument,
   setContextKey,
   setWorkspaceState,
 } from './common/lib/vscode-utils';
@@ -109,7 +110,7 @@ export function activate(context: vscode.ExtensionContext) {
     try {
       logger.debug(`Scanning single file: ${relativePath}`);
 
-      const document = await vscode.workspace.openTextDocument(uri);
+      const document = await openTextDocument(uri);
       const content = document.getText();
       const config = await loadEffectiveConfig(context, workspaceFolder.uri.fsPath);
       let newResults = await scanContent(uri.fsPath, content, config);

@@ -1,6 +1,14 @@
 import * as vscode from 'vscode';
 import { getGlobalConfigPath, getLocalConfigPath } from '../common/lib/config-manager';
-import { Command, executeCommand, registerCommand, updateState } from '../common/lib/vscode-utils';
+import {
+  Command,
+  executeCommand,
+  openTextDocument,
+  registerCommand,
+  showToastMessage,
+  ToastKind,
+  updateState,
+} from '../common/lib/vscode-utils';
 import { getAllBranches, getCurrentBranch, invalidateCache } from '../common/utils/git-helper';
 import { logger } from '../common/utils/logger';
 import { SearchResultProvider } from '../sidebar/search-provider';
@@ -57,14 +65,14 @@ async function openProjectCscannerConfigs(context: vscode.ExtensionContext) {
   const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
 
   if (!workspaceFolder) {
-    vscode.window.showErrorMessage('No workspace folder open');
+    showToastMessage(ToastKind.Error, 'No workspace folder open');
     return;
   }
 
   const localConfigPath = getLocalConfigPath(workspaceFolder.uri.fsPath);
   try {
     await vscode.workspace.fs.stat(localConfigPath);
-    const doc = await vscode.workspace.openTextDocument(localConfigPath);
+    const doc = await openTextDocument(localConfigPath);
     await vscode.window.showTextDocument(doc);
     return;
   } catch {
@@ -74,14 +82,14 @@ async function openProjectCscannerConfigs(context: vscode.ExtensionContext) {
   const globalConfigPath = getGlobalConfigPath(context, workspaceFolder.uri.fsPath);
   try {
     await vscode.workspace.fs.stat(globalConfigPath);
-    const doc = await vscode.workspace.openTextDocument(globalConfigPath);
+    const doc = await openTextDocument(globalConfigPath);
     await vscode.window.showTextDocument(doc);
     return;
   } catch {
     logger.debug('Global config not found');
   }
 
-  vscode.window.showErrorMessage('No Cscanner configuration found. Create one via "Manage Rules" first.');
+  showToastMessage(ToastKind.Error, 'No Cscanner configuration found. Create one via "Manage Rules" first.');
 }
 
 async function showScanSettingsMenu(
@@ -121,13 +129,13 @@ async function showScanSettingsMenu(
   } else if (selected.label.includes('Branch')) {
     const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
     if (!workspaceFolder) {
-      vscode.window.showErrorMessage('No workspace folder open');
+      showToastMessage(ToastKind.Error, 'No workspace folder open');
       return;
     }
 
     const currentBranch = await getCurrentBranch(workspaceFolder.uri.fsPath);
     if (!currentBranch) {
-      vscode.window.showErrorMessage('Not in a git repository');
+      showToastMessage(ToastKind.Error, 'Not in a git repository');
       return;
     }
 
@@ -154,7 +162,7 @@ async function showScanSettingsMenu(
       const branches = await getAllBranches(workspaceFolder.uri.fsPath);
 
       if (branches.length === 0) {
-        vscode.window.showErrorMessage('No branches found');
+        showToastMessage(ToastKind.Error, 'No branches found');
         return;
       }
 
