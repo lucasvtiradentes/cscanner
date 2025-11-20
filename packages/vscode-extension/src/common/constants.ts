@@ -8,7 +8,9 @@ import {
   addDevLabel,
   buildLogFilename,
 } from './scripts-constants';
-import { IS_DEV } from './utils/is-dev';
+
+declare const __IS_DEV_BUILD__: boolean;
+const IS_DEV = typeof __IS_DEV_BUILD__ !== 'undefined' && __IS_DEV_BUILD__;
 
 export const EXTENSION_ID_PROD = `${EXTENSION_PUBLISHER}.${EXTENSION_NAME}`;
 export const EXTENSION_ID_DEV = `${EXTENSION_PUBLISHER}.${EXTENSION_NAME}-dev`;

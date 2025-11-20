@@ -1,5 +1,4 @@
 import * as vscode from 'vscode';
-import { getCommandId } from '../common/constants';
 import {
   CscannerConfig,
   getDefaultConfig,
@@ -11,6 +10,7 @@ import {
 } from '../common/lib/config-manager';
 import { RustClient } from '../common/lib/rust-client';
 import { getRustBinaryPath } from '../common/lib/scanner';
+import { Command, executeCommand, registerCommand } from '../common/lib/vscode-utils';
 import { logger } from '../common/utils/logger';
 
 interface RuleQuickPickItem extends vscode.QuickPickItem {
@@ -33,7 +33,7 @@ function getCategoryIcon(category: string): string {
 }
 
 export function createManageRulesCommand(updateStatusBar: () => Promise<void>, context: vscode.ExtensionContext) {
-  return vscode.commands.registerCommand(getCommandId('manageRules'), async () => {
+  return registerCommand(Command.ManageRules, async () => {
     const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
     if (!workspaceFolder) {
       vscode.window.showErrorMessage('No workspace folder open');
@@ -223,7 +223,7 @@ export function createManageRulesCommand(updateStatusBar: () => Promise<void>, c
 
       await updateStatusBar();
 
-      await vscode.commands.executeCommand(getCommandId('findIssue'));
+      await executeCommand(Command.FindIssue);
     } catch (error) {
       logger.error(`Failed to manage rules: ${error}`);
       await client.stop();

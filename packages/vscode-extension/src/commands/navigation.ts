@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
-import { getCommandId } from '../common/constants';
+import { Command, registerCommand } from '../common/lib/vscode-utils';
 
 export function createOpenFileCommand() {
-  return vscode.commands.registerCommand(getCommandId('openFile'), (uri: vscode.Uri, line: number, column: number) => {
+  return registerCommand(Command.OpenFile, (uri: vscode.Uri, line: number, column: number) => {
     vscode.workspace.openTextDocument(uri).then((doc) => {
       vscode.window.showTextDocument(doc).then((editor) => {
         const position = new vscode.Position(line, column);
@@ -14,7 +14,7 @@ export function createOpenFileCommand() {
 }
 
 export function createCopyPathCommand() {
-  return vscode.commands.registerCommand(getCommandId('copyPath'), (item: any) => {
+  return registerCommand(Command.CopyPath, (item: any) => {
     if (item && item.resourceUri) {
       vscode.env.clipboard.writeText(item.resourceUri.fsPath);
       vscode.window.showInformationMessage(`Copied: ${item.resourceUri.fsPath}`);
@@ -23,7 +23,7 @@ export function createCopyPathCommand() {
 }
 
 export function createCopyRelativePathCommand() {
-  return vscode.commands.registerCommand(getCommandId('copyRelativePath'), (item: any) => {
+  return registerCommand(Command.CopyRelativePath, (item: any) => {
     if (item && item.resourceUri) {
       const relativePath = vscode.workspace.asRelativePath(item.resourceUri);
       vscode.env.clipboard.writeText(relativePath);

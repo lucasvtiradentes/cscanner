@@ -1,12 +1,12 @@
 import * as vscode from 'vscode';
-import { getCommandId } from '../common/constants';
+import { Command, registerCommand } from '../common/lib/vscode-utils';
 import { logger } from '../common/utils/logger';
 import { SearchResultProvider } from '../sidebar/search-provider';
 
 let currentIssueIndex = -1;
 
 export function createGoToNextIssueCommand(searchProvider: SearchResultProvider) {
-  return vscode.commands.registerCommand(getCommandId('goToNextIssue'), async () => {
+  return registerCommand(Command.GoToNextIssue, async () => {
     const results = searchProvider.getResults();
 
     if (results.length === 0) {
@@ -31,7 +31,7 @@ export function createGoToNextIssueCommand(searchProvider: SearchResultProvider)
 }
 
 export function createGoToPreviousIssueCommand(searchProvider: SearchResultProvider) {
-  return vscode.commands.registerCommand(getCommandId('goToPreviousIssue'), async () => {
+  return registerCommand(Command.GoToPreviousIssue, async () => {
     const results = searchProvider.getResults();
 
     if (results.length === 0) {

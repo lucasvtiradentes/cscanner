@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
-import { getCommandId, getContextKey } from '../common/constants';
 import { getGlobalConfigPath, getLocalConfigPath } from '../common/lib/config-manager';
+import { Command, executeCommand, registerCommand, updateState } from '../common/lib/vscode-utils';
 import { getAllBranches, getCurrentBranch, invalidateCache } from '../common/utils/git-helper';
 import { logger } from '../common/utils/logger';
 import { SearchResultProvider } from '../sidebar/search-provider';
@@ -12,7 +12,7 @@ export function createOpenSettingsMenuCommand(
   context: vscode.ExtensionContext,
   searchProvider: SearchResultProvider,
 ) {
-  return vscode.commands.registerCommand(getCommandId('openSettingsMenu'), async () => {
+  return registerCommand(Command.OpenSettingsMenu, async () => {
     logger.info('openSettingsMenu command called');
     const mainMenuItems: vscode.QuickPickItem[] = [
       {
@@ -37,7 +37,7 @@ export function createOpenSettingsMenuCommand(
     if (!selected) return;
 
     if (selected.label.includes('Manage Rules')) {
-      await vscode.commands.executeCommand(getCommandId('manageRules'));
+      await executeCommand(Command.ManageRules);
       return;
     }
 
@@ -114,11 +114,10 @@ async function showScanSettingsMenu(
   if (selected.label.includes('Codebase')) {
     searchProvider.setResults([]);
     currentScanModeRef.current = 'workspace';
-    context.workspaceState.update('cscanner.scanMode', 'workspace');
-    vscode.commands.executeCommand('setContext', getContextKey('cscannerScanMode'), 'workspace');
+    updateState(context, 'scanMode', 'workspace');
     invalidateCache();
     updateStatusBar();
-    vscode.commands.executeCommand(getCommandId('findIssue'));
+    executeCommand(Command.FindIssue);
   } else if (selected.label.includes('Branch')) {
     const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
     if (!workspaceFolder) {
@@ -198,15 +197,14 @@ async function showScanSettingsMenu(
       if (!selectedBranch || !selectedBranch.detail) return;
 
       currentCompareBranchRef.current = selectedBranch.detail;
-      context.workspaceState.update('cscanner.compareBranch', currentCompareBranchRef.current);
+      updateState(context, 'compareBranch', currentCompareBranchRef.current);
     }
 
     searchProvider.setResults([]);
     currentScanModeRef.current = 'branch';
-    context.workspaceState.update('cscanner.scanMode', 'branch');
-    vscode.commands.executeCommand('setContext', getContextKey('cscannerScanMode'), 'branch');
+    updateState(context, 'scanMode', 'branch');
     invalidateCache();
     updateStatusBar();
-    vscode.commands.executeCommand(getCommandId('findIssue'));
+    executeCommand(Command.FindIssue);
   }
 }
