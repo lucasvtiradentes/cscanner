@@ -42,13 +42,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   searchProvider.viewMode = viewModeKey;
   searchProvider.groupMode = groupModeKey;
-
-  const cachedResults = getWorkspaceState(context, WorkspaceStateKey.CachedResults);
-  const deserializedResults = cachedResults.map((r) => ({
-    ...r,
-    uri: vscode.Uri.parse(r.uriString),
-  }));
-  searchProvider.setResults(deserializedResults);
+  searchProvider.setResults([]);
 
   setContextKey(ContextKey.ViewMode, viewModeKey);
   setContextKey(ContextKey.GroupMode, groupModeKey);
