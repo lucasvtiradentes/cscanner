@@ -34,6 +34,9 @@ enum Commands {
 
         #[arg(long, help = "Group issues by rule (default: group by file)")]
         by_rule: bool,
+
+        #[arg(long, help = "Output results as JSON")]
+        json: bool,
     },
 
     #[command(about = "List all available rules and their metadata")]
@@ -59,13 +62,14 @@ fn main() -> Result<()> {
             path,
             no_cache,
             by_rule,
+            json,
         } => {
             let group_mode = if by_rule {
                 GroupMode::Rule
             } else {
                 GroupMode::File
             };
-            cmd_check(&path, no_cache, group_mode)
+            cmd_check(&path, no_cache, group_mode, json)
         }
         Commands::Rules { path } => cmd_rules(&path),
         Commands::Init { path } => cmd_init(&path),
