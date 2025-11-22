@@ -16,6 +16,7 @@ import {
   showToastMessage,
   updateState,
 } from '../common/lib/vscode-utils';
+import { hasConfiguredRules } from '../common/types';
 import { branchExists, getChangedFiles, getModifiedLineRanges } from '../common/utils/git-helper';
 import { getNewIssues } from '../common/utils/issue-comparator';
 import { logger } from '../common/utils/logger';
@@ -51,7 +52,7 @@ export function createFindIssueCommand(
     const effectiveConfig = await loadEffectiveConfig(context, workspaceFolder.uri.fsPath);
     const hasLocal = await hasLocalConfig(workspaceFolder.uri.fsPath);
 
-    if (!effectiveConfig || Object.keys(effectiveConfig.rules).length === 0) {
+    if (!hasConfiguredRules(effectiveConfig)) {
       if (!options?.silent) {
         const action = await showToastMessage(
           ToastKind.Warning,

@@ -1,21 +1,87 @@
 {
-  "rules": {
-    "no-any-type": {
-      "enabled": true,
-      "type": "ast",
-      "severity": "error",
-      "include": [],
-      "exclude": [],
-      "message": "Found 'any' type annotation",
-      "pattern": null
-    },
+  "$schema": "../packages/cli/schema.json",
+  "builtinRules": {
     "no-var": {
-      "enabled": true,
-      "type": "ast",
-      "severity": "warning",
-      "message": null
+      "enabled": true
+    },
+    "prefer-type-over-interface": {
+      "enabled": true
+    },
+    "prefer-interface-over-type": {
+      "enabled": true
+    },
+    "no-constant-condition": {
+      "enabled": true
+    },
+    "no-duplicate-imports": {
+      "enabled": true
+    },
+    "no-unreachable-code": {
+      "enabled": true
+    },
+    "no-relative-imports": {
+      "enabled": true
+    },
+    "max-function-length": {
+      "enabled": true
+    },
+    "no-nested-ternary": {
+      "enabled": true
+    },
+    "no-nested-require": {
+      "enabled": true
+    },
+    "no-empty-function": {
+      "enabled": true
+    },
+    "no-dynamic-import": {
+      "enabled": true
+    },
+    "consistent-return": {
+      "enabled": true
+    },
+    "no-magic-numbers": {
+      "enabled": true
+    },
+    "no-alias-imports": {
+      "enabled": true
+    },
+    "no-implicit-any": {
+      "enabled": true
+    },
+    "no-unused-vars": {
+      "enabled": true
+    },
+    "no-empty-class": {
+      "enabled": true
+    },
+    "prefer-const": {
+      "enabled": true
+    },
+    "no-any-type": {
+      "enabled": true
+    },
+    "no-todo-comments": {
+      "enabled": true
+    },
+    "no-console-log": {
+      "enabled": true
     }
   },
-  "include": ["**/*.{ts,tsx}"],
-  "exclude": ["node_modules/**", "dist/**", "build/**", ".git/**"]
+  "customRules": {
+    "no-todo-comments": {
+      "type": "regex",
+      "pattern": "TODO:",
+      "message": "TODO comments should be resolved",
+      "enabled": true
+    },
+    "no-console-log2": {
+      "type": "regex",
+      "pattern": "console\\.log\\(",
+      "message": "console.log should not be used in production",
+      "enabled": true
+    }
+  },
+  "include": ["**/*.ts", "**/*.tsx"],
+  "exclude": ["**/node_modules/**", "**/dist/**", "**/build/**", "**/.git/**"]
 }

@@ -13,7 +13,9 @@ pub mod utils;
 pub mod watcher;
 
 pub use cache::FileCache;
-pub use config::{CompiledRuleConfig, RuleConfig, RuleType, TscannerConfig};
+pub use config::{
+    BuiltinRuleConfig, CompiledRuleConfig, CustomRuleConfig, CustomRuleType, TscannerConfig,
+};
 pub use constants::*;
 pub use logger::{get_logger, init_logger, log_debug, log_error, log_info, log_warn};
 pub use parser::parse_file;

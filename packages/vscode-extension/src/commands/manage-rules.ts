@@ -66,26 +66,24 @@ export function createManageRulesCommand(updateStatusBar: () => Promise<void>, c
       const builtinRuleNames = new Set(rules.map((r) => r.name));
       const customRules: RuleQuickPickItem[] = [];
 
-      if (existingConfig?.rules) {
-        for (const [ruleName, ruleConfig] of Object.entries(existingConfig.rules)) {
-          if (!builtinRuleNames.has(ruleName) && (ruleConfig as any).pattern) {
-            customRules.push({
-              label: `$(regex) ${ruleName}`,
-              description: `[REGEX] custom`,
-              detail: (ruleConfig as any).message || (ruleConfig as any).pattern,
-              ruleName,
-              picked: (ruleConfig as any).enabled ?? true,
-              isCustom: true,
-            });
-          }
+      if (existingConfig?.customRules) {
+        for (const [ruleName, ruleConfig] of Object.entries(existingConfig.customRules)) {
+          customRules.push({
+            label: `$(regex) ${ruleName}`,
+            description: `[REGEX] custom`,
+            detail: ruleConfig.message || (ruleConfig as any).pattern,
+            ruleName,
+            picked: ruleConfig.enabled ?? true,
+            isCustom: true,
+          });
         }
       }
 
       const rulesByCategory = new Map<string, RuleQuickPickItem[]>();
 
       for (const rule of rules) {
-        const existingRule = existingConfig?.rules?.[rule.name];
-        const isEnabled = existingRule?.enabled ?? false;
+        const existingRule = existingConfig?.builtinRules?.[rule.name];
+        const isEnabled = existingRule?.enabled ?? (existingRule !== undefined ? true : false);
 
         const ruleItem: RuleQuickPickItem = {
           label: `$(${getCategoryIcon(rule.category)}) ${rule.displayName}`,
@@ -157,25 +155,29 @@ export function createManageRulesCommand(updateStatusBar: () => Promise<void>, c
 
       const config: TscannerConfig = existingConfig;
 
-      if (!config.rules) {
-        config.rules = {};
+      if (!config.builtinRules) {
+        config.builtinRules = {};
+      }
+      if (!config.customRules) {
+        config.customRules = {};
       }
 
       for (const rule of rules) {
-        const existingRule = config.rules[rule.name];
-
         if (enabledRules.has(rule.name)) {
-          config.rules[rule.name] = existingRule || {
-            enabled: true,
-            type: rule.ruleType,
-            severity: rule.defaultSeverity,
-            message: null,
-          };
-          config.rules[rule.name].enabled = true;
+          config.builtinRules[rule.name] = config.builtinRules[rule.name] || {};
+          config.builtinRules[rule.name].enabled = true;
         } else {
-          if (existingRule) {
-            existingRule.enabled = false;
+          if (config.builtinRules[rule.name]) {
+            config.builtinRules[rule.name].enabled = false;
           }
+        }
+      }
+
+      for (const customRule of customRules) {
+        const existingCustom = existingConfig?.customRules?.[customRule.ruleName];
+        if (existingCustom) {
+          existingCustom.enabled = enabledRules.has(customRule.ruleName);
+          config.customRules[customRule.ruleName] = existingCustom;
         }
       }
 

@@ -6,6 +6,10 @@ authors.workspace = true
 license.workspace = true
 repository.workspace = true
 
+[[bin]]
+name = "generate_schema"
+path = "src/bin/generate_schema.rs"
+
 [dependencies]
 swc_ecma_parser = { workspace = true }
 swc_ecma_ast = { workspace = true }
@@ -18,6 +22,7 @@ ignore = { workspace = true }
 globset = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
+schemars = { workspace = true }
 notify = { workspace = true }
 anyhow = { workspace = true }
 thiserror = { workspace = true }

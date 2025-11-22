@@ -1,4 +1,4 @@
-use crate::config::{CompiledRuleConfig, RuleType, TscannerConfig};
+use crate::config::{CompiledRuleConfig, CustomRuleType, TscannerConfig};
 use crate::rules::{RegexRule, Rule, RuleRegistration};
 use crate::types::Severity;
 use std::collections::HashMap;
@@ -27,18 +27,21 @@ impl RuleRegistry {
     pub fn with_config(config: &TscannerConfig) -> Result<Self, Box<dyn std::error::Error>> {
         let mut registry = Self::new();
 
-        for (rule_name, rule_config) in &config.rules {
-            if rule_config.rule_type == RuleType::Regex {
-                if let Some(pattern) = &rule_config.pattern {
-                    let message = rule_config
-                        .message
-                        .clone()
-                        .unwrap_or_else(|| format!("Rule '{}' matched", rule_name));
+        for rule_name in config.builtin_rules.keys() {
+            if let Ok(compiled) = config.compile_builtin_rule(rule_name) {
+                registry
+                    .compiled_configs
+                    .insert(rule_name.clone(), compiled);
+            }
+        }
 
+        for (rule_name, rule_config) in &config.custom_rules {
+            if rule_config.rule_type == CustomRuleType::Regex {
+                if let Some(pattern) = &rule_config.pattern {
                     match RegexRule::new(
                         rule_name.clone(),
                         pattern.clone(),
-                        message,
+                        rule_config.message.clone(),
                         rule_config.severity,
                     ) {
                         Ok(regex_rule) => {
@@ -57,7 +60,7 @@ impl RuleRegistry {
                 }
             }
 
-            if let Ok(compiled) = config.compile_rule(rule_name) {
+            if let Ok(compiled) = config.compile_custom_rule(rule_name) {
                 registry
                     .compiled_configs
                     .insert(rule_name.clone(), compiled);
