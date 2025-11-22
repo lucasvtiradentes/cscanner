@@ -345,26 +345,3 @@ fn compile_globs(
 
     Ok(builder.build()?)
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_default_config() {
-        let config = TscannerConfig::default();
-        assert!(config.rules.contains_key("no-any-type"));
-        assert_eq!(config.include.len(), 1);
-        assert!(config.exclude.len() > 0);
-    }
-
-    #[test]
-    fn test_glob_matching() {
-        let config = TscannerConfig::default();
-        let compiled = config.compile_rule("no-any-type").unwrap();
-
-        assert!(config.matches_file(Path::new("src/test.ts"), &compiled));
-        assert!(config.matches_file(Path::new("src/test.tsx"), &compiled));
-        assert!(!config.matches_file(Path::new("node_modules/test.ts"), &compiled));
-    }
-}

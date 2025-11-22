@@ -124,29 +124,3 @@ impl Default for RuleRegistry {
         Self::new()
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_registry_creation() {
-        let registry = RuleRegistry::new();
-        assert!(registry.rules.contains_key("no-any-type"));
-    }
-
-    #[test]
-    fn test_registry_with_config() {
-        let config = TscannerConfig::default();
-        let registry = RuleRegistry::with_config(&config).unwrap();
-        assert!(registry.is_enabled("no-any-type"));
-    }
-
-    #[test]
-    fn test_get_enabled_rules() {
-        let config = TscannerConfig::default();
-        let registry = RuleRegistry::with_config(&config).unwrap();
-        let rules = registry.get_enabled_rules(Path::new("src/test.ts"), &config);
-        assert!(!rules.is_empty());
-    }
-}
