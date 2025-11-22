@@ -14,7 +14,7 @@ export enum GroupMode {
 }
 
 export enum ScanMode {
-  Workspace = 'workspace',
+  Codebase = 'codebase',
   Branch = 'branch',
 }
 
@@ -40,7 +40,7 @@ type WorkspaceStateKeyType = keyof WorkspaceStateSchema;
 const defaultValues: WorkspaceStateSchema = {
   [WorkspaceStateKey.ViewMode]: ViewMode.List,
   [WorkspaceStateKey.GroupMode]: GroupMode.Default,
-  [WorkspaceStateKey.ScanMode]: ScanMode.Workspace,
+  [WorkspaceStateKey.ScanMode]: ScanMode.Codebase,
   [WorkspaceStateKey.CompareBranch]: 'main',
   [WorkspaceStateKey.CachedResults]: [],
 };

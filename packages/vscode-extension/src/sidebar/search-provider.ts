@@ -12,13 +12,6 @@ export class SearchResultProvider implements vscode.TreeDataProvider<SearchResul
   private _onDidChangeTreeData = new vscode.EventEmitter<SearchResultItem | undefined | void>();
   readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
 
-  private readonly conflictingRules = new Map<string, string>([
-    ['prefer-type-over-interface', 'prefer-interface-over-type'],
-    ['prefer-interface-over-type', 'prefer-type-over-interface'],
-    ['no-relative-imports', 'no-absolute-imports'],
-    ['no-absolute-imports', 'no-relative-imports'],
-  ]);
-
   get viewMode(): ViewMode {
     return this._viewMode;
   }
@@ -64,11 +57,6 @@ export class SearchResultProvider implements vscode.TreeDataProvider<SearchResul
     return grouped;
   }
 
-  private isRuleConflicting(ruleName: string, allRules: Set<string>): boolean {
-    const conflictingRule = this.conflictingRules.get(ruleName);
-    return conflictingRule !== undefined && allRules.has(conflictingRule);
-  }
-
   getAllFolderItems(): FolderResultItem[] {
     if (this._viewMode !== ViewMode.Tree) {
       return [];
@@ -99,12 +87,8 @@ export class SearchResultProvider implements vscode.TreeDataProvider<SearchResul
     if (!element) {
       if (this._groupMode === GroupMode.Rule) {
         const grouped = this.groupByRule();
-        const allRules = new Set(grouped.keys());
         return Promise.resolve(
-          Array.from(grouped.entries()).map(
-            ([rule, results]) =>
-              new RuleGroupItem(rule, results, this._viewMode, this.isRuleConflicting(rule, allRules)),
-          ),
+          Array.from(grouped.entries()).map(([rule, results]) => new RuleGroupItem(rule, results, this._viewMode)),
         );
       }
 
@@ -126,7 +110,7 @@ export class SearchResultProvider implements vscode.TreeDataProvider<SearchResul
         const tree = buildFolderTree(this.results, workspaceRoot);
 
         const items: SearchResultItem[] = [];
-        for (const [name, node] of tree) {
+        for (const [, node] of tree) {
           if (node.type === NodeKind.Folder) {
             items.push(new FolderResultItem(node));
           } else {
@@ -143,7 +127,7 @@ export class SearchResultProvider implements vscode.TreeDataProvider<SearchResul
         const tree = buildFolderTree(element.results, workspaceRoot);
 
         const items: SearchResultItem[] = [];
-        for (const [name, node] of tree) {
+        for (const [, node] of tree) {
           if (node.type === NodeKind.Folder) {
             items.push(new FolderResultItem(node));
           } else {
@@ -154,7 +138,7 @@ export class SearchResultProvider implements vscode.TreeDataProvider<SearchResul
       }
     } else if (element instanceof FolderResultItem) {
       const items: SearchResultItem[] = [];
-      for (const [name, node] of element.node.children) {
+      for (const [, node] of element.node.children) {
         if (node.type === NodeKind.Folder) {
           items.push(new FolderResultItem(node));
         } else {

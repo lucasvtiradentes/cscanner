@@ -86,8 +86,8 @@ export function createFindIssueCommand(
         if (action === 'Change Branch') {
           await executeCommand(Command.OpenSettingsMenu);
         } else if (action === 'Switch to Workspace Mode') {
-          currentScanModeRef.current = ScanMode.Workspace;
-          updateState(context, WorkspaceStateKey.ScanMode, ScanMode.Workspace);
+          currentScanModeRef.current = ScanMode.Codebase;
+          updateState(context, WorkspaceStateKey.ScanMode, ScanMode.Codebase);
           await updateStatusBar();
           await executeCommand(Command.FindIssue, { silent: true });
         }

@@ -28,7 +28,7 @@ export class StatusBarManager {
     const hasConfig = hasConfiguredRules(config);
 
     const icon = hasConfig ? '$(gear)' : '$(warning)';
-    const modeText = this.currentScanModeRef.current === ScanMode.Workspace ? 'Codebase' : 'Branch';
+    const modeText = this.currentScanModeRef.current === ScanMode.Codebase ? 'Codebase' : 'Branch';
     const branchText =
       this.currentScanModeRef.current === ScanMode.Branch ? ` (${this.currentCompareBranchRef.current})` : '';
     const configWarning = hasConfig ? '' : ' [No rules configured]';
