@@ -19,7 +19,7 @@ pub enum GroupMode {
 #[command(version, about = APP_DESCRIPTION, long_about = None)]
 struct Cli {
     #[command(subcommand)]
-    command: Commands,
+    command: Option<Commands>,
 }
 
 #[derive(Subcommand)]
@@ -65,13 +65,13 @@ fn main() -> Result<()> {
     let cli = Cli::parse();
 
     match cli.command {
-        Commands::Check {
+        Some(Commands::Check {
             path,
             no_cache,
             by_rule,
             json,
             branch,
-        } => {
+        }) => {
             let group_mode = if by_rule {
                 GroupMode::Rule
             } else {
@@ -79,7 +79,11 @@ fn main() -> Result<()> {
             };
             cmd_check(&path, no_cache, group_mode, json, branch)
         }
-        Commands::Rules { path } => cmd_rules(&path),
-        Commands::Init { path } => cmd_init(&path),
+        Some(Commands::Rules { path }) => cmd_rules(&path),
+        Some(Commands::Init { path }) => cmd_init(&path),
+        None => {
+            Cli::parse_from(["tscanner", "--help"]);
+            Ok(())
+        }
     }
 }
