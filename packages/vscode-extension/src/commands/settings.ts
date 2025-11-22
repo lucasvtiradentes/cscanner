@@ -105,7 +105,7 @@ async function showScanSettingsMenu(
   const scanModeItems: vscode.QuickPickItem[] = [
     {
       label: '$(file-directory) Codebase',
-      description: currentScanModeRef.current === ScanMode.Workspace ? '✓ Active' : '',
+      description: currentScanModeRef.current === ScanMode.Codebase ? '✓ Active' : '',
       detail: 'Scan all files in workspace',
     },
     {
@@ -122,10 +122,10 @@ async function showScanSettingsMenu(
 
   if (!selected) return;
 
-  if (selected.label.includes('Codebase')) {
+  if (selected.label.includes(ScanMode.Codebase)) {
     searchProvider.setResults([]);
-    currentScanModeRef.current = ScanMode.Workspace;
-    updateState(context, WorkspaceStateKey.ScanMode, ScanMode.Workspace);
+    currentScanModeRef.current = ScanMode.Codebase;
+    updateState(context, WorkspaceStateKey.ScanMode, ScanMode.Codebase);
     invalidateCache();
     updateStatusBar();
     executeCommand(Command.FindIssue);

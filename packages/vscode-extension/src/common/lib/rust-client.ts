@@ -33,20 +33,28 @@ export class RustClient {
 
   async start(): Promise<void> {
     if (this.process) {
+      logger.info('Rust server already running');
       return;
     }
 
     logger.info(`Starting Rust server: ${this.binaryPath}`);
 
-    this.process = spawn(this.binaryPath, [], {
-      stdio: ['pipe', 'pipe', 'pipe'],
-      env: {
-        ...process.env,
-        NO_COLOR: '1',
-        RUST_LOG_STYLE: 'never',
-        RUST_LOG: 'core=warn,server=info',
-      },
-    });
+    try {
+      this.process = spawn(this.binaryPath, [], {
+        stdio: ['pipe', 'pipe', 'pipe'],
+        env: {
+          ...process.env,
+          NO_COLOR: '1',
+          RUST_LOG_STYLE: 'never',
+          RUST_LOG: 'core=warn,server=info',
+        },
+      });
+
+      logger.info(`Rust server spawned with PID: ${this.process.pid}`);
+    } catch (error) {
+      logger.error(`Failed to spawn Rust server: ${error}`);
+      throw error;
+    }
 
     this.process.stdout!.on('data', (data: Buffer) => {
       const chunkSize = data.length;
@@ -125,24 +133,35 @@ export class RustClient {
 
   private async sendRequest(method: string, params: any): Promise<any> {
     if (!this.process) {
+      logger.info(`Process not running, starting server for method: ${method}`);
       await this.start();
+    }
+
+    if (!this.process || !this.process.stdin) {
+      const error = 'Rust server process or stdin not available';
+      logger.error(error);
+      throw new Error(error);
     }
 
     const id = ++this.requestId;
     const request: RpcRequest = { id, method, params };
 
+    logger.info(`Sending request ${id}: ${method}`);
+
     return new Promise((resolve, reject) => {
       this.pendingRequests.set(id, { resolve, reject });
 
       const json = JSON.stringify(request);
+      logger.info(`Writing request to stdin: ${json.substring(0, 200)}...`);
       this.process!.stdin!.write(json + '\n');
     });
   }
 
-  async scan(workspaceRoot: string, fileFilter?: Set<string>, config?: any): Promise<IssueResult[]> {
+  async scan(workspaceRoot: string, fileFilter?: Set<string>, config?: any, branch?: string): Promise<IssueResult[]> {
     const result: ScanResult = await this.sendRequest('scan', {
       root: workspaceRoot,
       config,
+      branch,
     });
 
     logger.info(`Rust scan completed: ${result.total_issues} issues in ${result.duration_ms}ms`);

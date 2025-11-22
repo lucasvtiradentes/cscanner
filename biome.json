@@ -17,7 +17,8 @@
       "**/.turbo/**",
       "**/binaries/**",
       "**/npm/**",
-      "**/pnpm-lock.yaml"
+      "pnpm-lock.yaml",
+      "/packages/cli/schema.json"
     ]
   },
   "formatter": {

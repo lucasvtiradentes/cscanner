@@ -85,14 +85,14 @@ export class SearchResultProvider implements vscode.TreeDataProvider<SearchResul
 
   getChildren(element?: SearchResultItem): Thenable<SearchResultItem[]> {
     if (!element) {
-      if (this._groupMode === 'rule') {
+      if (this._groupMode === GroupMode.Rule) {
         const grouped = this.groupByRule();
         return Promise.resolve(
           Array.from(grouped.entries()).map(([rule, results]) => new RuleGroupItem(rule, results, this._viewMode)),
         );
       }
 
-      if (this._viewMode === 'list') {
+      if (this._viewMode === ViewMode.List) {
         const grouped = new Map<string, IssueResult[]>();
         for (const result of this.results) {
           const filePath = result.uri.fsPath;
@@ -110,7 +110,7 @@ export class SearchResultProvider implements vscode.TreeDataProvider<SearchResul
         const tree = buildFolderTree(this.results, workspaceRoot);
 
         const items: SearchResultItem[] = [];
-        for (const [name, node] of tree) {
+        for (const [, node] of tree) {
           if (node.type === NodeKind.Folder) {
             items.push(new FolderResultItem(node));
           } else {
@@ -120,14 +120,14 @@ export class SearchResultProvider implements vscode.TreeDataProvider<SearchResul
         return Promise.resolve(items);
       }
     } else if (element instanceof RuleGroupItem) {
-      if (element.viewMode === 'list') {
+      if (element.viewMode === ViewMode.List) {
         return Promise.resolve(element.results.map((r) => new LineResultItem(r)));
       } else {
         const workspaceRoot = getCurrentWorkspaceFolder()?.uri.fsPath || '';
         const tree = buildFolderTree(element.results, workspaceRoot);
 
         const items: SearchResultItem[] = [];
-        for (const [name, node] of tree) {
+        for (const [, node] of tree) {
           if (node.type === NodeKind.Folder) {
             items.push(new FolderResultItem(node));
           } else {
@@ -138,7 +138,7 @@ export class SearchResultProvider implements vscode.TreeDataProvider<SearchResul
       }
     } else if (element instanceof FolderResultItem) {
       const items: SearchResultItem[] = [];
-      for (const [name, node] of element.node.children) {
+      for (const [, node] of element.node.children) {
         if (node.type === NodeKind.Folder) {
           items.push(new FolderResultItem(node));
         } else {

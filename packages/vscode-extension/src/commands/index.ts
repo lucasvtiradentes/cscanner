@@ -9,10 +9,10 @@ import { createHardScanCommand, createRefreshCommand } from './scan';
 import { createOpenSettingsMenuCommand } from './settings';
 import { createShowLogsCommand } from './show-logs';
 import {
-  createSetGroupByDefaultCommand,
-  createSetGroupByRuleCommand,
-  createSetListViewCommand,
-  createSetTreeViewCommand,
+  createCycleViewModeFileFlatViewCommand,
+  createCycleViewModeFileTreeViewCommand,
+  createCycleViewModeRuleFlatViewCommand,
+  createCycleViewModeRuleTreeViewCommand,
 } from './view-mode';
 
 export interface CommandContext {
@@ -46,10 +46,10 @@ export function registerAllCommands(ctx: CommandContext): vscode.Disposable[] {
       ctx.context,
       ctx.searchProvider,
     ),
-    createSetListViewCommand(ctx.searchProvider, ctx.context),
-    createSetTreeViewCommand(ctx.searchProvider, ctx.context),
-    createSetGroupByDefaultCommand(ctx.searchProvider, ctx.context),
-    createSetGroupByRuleCommand(ctx.searchProvider, ctx.context),
+    createCycleViewModeFileFlatViewCommand(ctx.searchProvider, ctx.context),
+    createCycleViewModeFileTreeViewCommand(ctx.searchProvider, ctx.context),
+    createCycleViewModeRuleFlatViewCommand(ctx.searchProvider, ctx.context),
+    createCycleViewModeRuleTreeViewCommand(ctx.searchProvider, ctx.context),
     createOpenFileCommand(),
     createCopyPathCommand(),
     createCopyRelativePathCommand(),
